@@ -7,16 +7,6 @@ plugins {
 group = 'com.luckit'
 version = '0.0.1-SNAPSHOT'
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-tasks.withType(JavaCompile) {
-    options.fork = true
-    options.forkOptions.javaHome = file(System.getenv('JAVA_HOME'))
-}
-
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -25,8 +15,7 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/snapshot' }
+
 }
 
 dependencies {
