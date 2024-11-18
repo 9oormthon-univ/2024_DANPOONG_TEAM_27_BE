@@ -15,7 +15,6 @@ configurations {
 
 repositories {
     mavenCentral()
-
 }
 
 dependencies {
@@ -31,4 +30,8 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+compileJava {
+    options.forkOptions.executable = "${System.getenv('JAVA_HOME')}/bin/javac"
 }
