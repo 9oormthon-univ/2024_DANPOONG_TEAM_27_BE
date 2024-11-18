@@ -13,7 +13,8 @@ java {
 }
 
 tasks.withType(JavaCompile) {
-    options.release = 17
+    options.fork = true
+    options.forkOptions.javaHome = file(System.getenv('JAVA_HOME'))
 }
 
 configurations {
