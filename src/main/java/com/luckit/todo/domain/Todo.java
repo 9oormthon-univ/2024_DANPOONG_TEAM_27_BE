@@ -24,4 +24,8 @@ public class Todo {
 
     private boolean idCompleted;
 
+    public void toggleCompleted() {
+        this.idCompleted = !this.idCompleted;
+    }
+
 }

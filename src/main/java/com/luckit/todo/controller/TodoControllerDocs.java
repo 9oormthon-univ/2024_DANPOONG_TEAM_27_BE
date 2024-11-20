@@ -58,4 +58,23 @@ public interface TodoControllerDocs {
             @PathVariable("goal_id") Integer goalId
     );
 
+    @Operation(
+            summary = "미션 완료 상태 변경",
+            description = "미션 상태 변경 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully change mission status.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> completeTodo(
+            @PathVariable("todo_id") Integer todoId
+    );
+
 }

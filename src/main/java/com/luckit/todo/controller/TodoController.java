@@ -32,4 +32,11 @@ public class TodoController implements TodoControllerDocs {
         return ApiResponseTemplate.success(SuccessCode.GET_TODO_SUCCESS, todoService.getTodo(goalId));
     }
 
+    @PostMapping("/{todo_id}")
+    public ApiResponseTemplate<String> completeTodo(
+            @PathVariable("todo_id") Integer todoId
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.COMPLETE_TODO_SUCCESS, todoService.completeTodo(todoId));
+    }
+
 }

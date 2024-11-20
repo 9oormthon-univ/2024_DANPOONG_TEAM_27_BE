@@ -58,4 +58,15 @@ public class TodoService {
 
         return getTodoDtos;
     }
+
+    public String completeTodo(Integer todoId) {
+
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_TODO_ERROR, ErrorCode.NO_TODO_ERROR.getMessage()));
+
+        todo.toggleCompleted();
+        todoRepository.save(todo);
+
+        return "Todo successfully completed.";
+    }
 }
