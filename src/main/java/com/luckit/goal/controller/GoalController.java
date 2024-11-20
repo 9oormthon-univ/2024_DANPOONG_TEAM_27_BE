@@ -3,17 +3,13 @@ package com.luckit.goal.controller;
 import com.luckit.global.exception.code.SuccessCode;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.goal.controller.dto.AddGoalDto;
-import com.luckit.goal.domain.Goal;
+import com.luckit.goal.controller.dto.GetGoalDto;
 import com.luckit.goal.service.GoalService;
-import com.luckit.user.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +24,13 @@ public class GoalController implements GoalControllerDocs {
             @RequestBody AddGoalDto addGoalDto
             ) {
         return ApiResponseTemplate.success(SuccessCode.ADD_GOAL_SUCCESS, goalService.addGoal(Integer.parseInt(principal.getName()), addGoalDto));
+    }
+
+    @GetMapping
+    public ApiResponseTemplate<List<GetGoalDto>> getGoal(
+            Principal principal
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.GET_GOAL_SUCCESS, goalService.getGoal(Integer.parseInt(principal.getName())));
     }
 
 }
