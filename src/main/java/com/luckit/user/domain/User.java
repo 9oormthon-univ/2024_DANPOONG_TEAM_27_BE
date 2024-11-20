@@ -34,7 +34,4 @@ public class User {
 
     private RoleType roleType;
 
-
-
-
 }
