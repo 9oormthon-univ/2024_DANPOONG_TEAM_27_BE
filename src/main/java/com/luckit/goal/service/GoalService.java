@@ -81,4 +81,15 @@ public class GoalService {
 
         return getGoalDtos;
     }
+
+    public String completeGoal(Integer goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
+
+        goal.toggleCompleted();
+        goalRepository.save(goal);
+
+        return "Goal successfully completed.";
+    }
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal;
@@ -59,5 +60,24 @@ public interface GoalControllerDocs {
     )
     ApiResponseTemplate<List<GetGoalDto>> getGoal(
             Principal principal
+    );
+
+    @Operation(
+            summary = "목표 완료 상태 변경",
+            description = "목표 상태 변경 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully change goal status.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> completeGoal(
+            @PathVariable("goal_id") Integer goalId
     );
 }
