@@ -10,7 +10,7 @@ spring:
 
   jpa:
     database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create
     show-sql: true
@@ -18,3 +18,23 @@ spring:
       hibernate:
         format_sql: false
         use_sql_comments: true
+
+  data:
+    redis:
+      port: ${REDIS_PORT}
+      host: ${REDIS_SERVER}
+      password: ${REDIS_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity-in-milliseconds: ${ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
+  refresh-token-validity-in-milliseconds: ${REFRESH_TOKEN_VALIDITY_IN_MILLISECONDS}
+
+
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+    admin-key: ${KAKAO_ADMIN_KEY}
+    token-url: ${KAKAO_TOKEN_URL}
+

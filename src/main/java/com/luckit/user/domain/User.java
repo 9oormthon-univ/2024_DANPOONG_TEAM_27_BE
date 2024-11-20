@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "USER_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer userId;
 
     private String name;
 
-    private String nickname;
+    private String nickName;
 
     private String email;
 
@@ -32,6 +32,21 @@ public class User {
 
     private LocalDateTime date_of_birth;
 
+    @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
+
+    public void updateInfo(String nickName) {this.nickName = nickName;}
+
+    @Builder
+    private User(String email,String name, String nickName, String profileImage, LoginType loginType, RoleType roleType){
+        this.email = email;
+        this.name = name;
+        this.nickName = nickName;
+        this.profileImage = profileImage;
+        this.loginType = loginType;
+        this.roleType = roleType;
+    }
 }
