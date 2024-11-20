@@ -3,7 +3,7 @@ package com.luckit.user.service;
 import com.luckit.global.dto.UserInfo;
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
-import com.luckit.user.controller.dto.CreateUserRequestDto;
+import com.luckit.user.controller.dto.CreateUserDto;
 import com.luckit.user.domain.User;
 import com.luckit.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class UserService {
                 .build();
     }
 
-    public String createUser(Integer id, CreateUserRequestDto requestDto) {
+    public String createUserFortune(Integer id, CreateUserDto requestDto) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_USER_INFO, ErrorCode.NO_USER_INFO.getMessage()));
@@ -56,4 +56,22 @@ public class UserService {
         return "User information successfully saved.";
     }
 
+    public CreateUserDto getUserFortune(Integer id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_USER_INFO, ErrorCode.NO_USER_INFO.getMessage()));
+
+
+        LocalDateTime dateOfBirth = user.getDate_of_birth();
+
+        return CreateUserDto.builder()
+                .gender(user.getGender())
+                .solarOrLunar(user.getSolarOrLunar())
+                .year(dateOfBirth.getYear())
+                .month(dateOfBirth.getMonthValue())
+                .day(dateOfBirth.getDayOfMonth())
+                .hour(dateOfBirth.getHour())
+                .minute(dateOfBirth.getMinute())
+                .build();
+    }
 }

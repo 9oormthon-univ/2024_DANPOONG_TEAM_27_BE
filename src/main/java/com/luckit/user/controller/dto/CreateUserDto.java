@@ -1,6 +1,9 @@
 package com.luckit.user.controller.dto;
 
-public record CreateUserRequestDto(
+import lombok.Builder;
+
+@Builder
+public record CreateUserDto(
         String gender,
         String solarOrLunar,
         int year,

@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum SuccessCode {
 
     // 200 OK
-    USER_CREATE_SUCCESS(HttpStatus.OK, "사용자 정보 생성을 성공했ㅅ브니다."),
+    USER_CREATE_SUCCESS(HttpStatus.OK, "사용자 정보 생성을 성공했습니다."),
     GET_TOKEN_SUCCESS(HttpStatus.OK, "Access 토큰을 성공적으로 가져왔습니다."),
     RENEW_TOKEN_SUCCESS(HttpStatus.OK, "Access 토큰을 성공적으로 재발급했습니다."),
     LOGIN_MEMBER_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
@@ -20,6 +20,7 @@ public enum SuccessCode {
     UPDATE_MEMBER_INFO_SUCCESS(HttpStatus.OK, "사용자 정보 수정에 성공했습니다."),
     EMAIL_VERIFICATION_SUCCESS(HttpStatus.OK, "이메일 인증에 성공했습니다."),
     EMAIL_CHECK_SUCCESS(HttpStatus.OK, "이메일 중복 검사에 성공했습니다."),
+    GET_USER_FORTUNE_SUCCESS(HttpStatus.OK, "사주 정보 조회에 성공했습니다"),
 
     // 201 Created
     CREATE_MEMBER_SUCCESS(HttpStatus.CREATED, "회원가입에 성공했습니다."),
