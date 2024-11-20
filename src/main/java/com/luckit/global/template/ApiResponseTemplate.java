@@ -26,6 +26,7 @@ public class ApiResponseTemplate<T> {
         return ApiResponseTemplate.<T>builder()
                 .status(errorCode.getHttpStatus().value())
                 .message(errorCode.getMessage())
+                .data(null)
                 .build();
     }
 }
