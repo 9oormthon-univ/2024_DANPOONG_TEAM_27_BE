@@ -42,7 +42,7 @@ public class GoalService {
         Goal goal = Goal.builder()
                 .user(user)
                 .name(addGoalDto.name())
-                .isCompleted(addGoalDto.isCompleted())
+                .isCompleted(false)
                 .startDate(start_date)
                 .endDate(end_date)
                 .build();
