@@ -1,0 +1,80 @@
+package com.luckit.todo.controller;
+
+import com.luckit.global.template.ApiResponseTemplate;
+import com.luckit.goal.controller.dto.GetGoalDto;
+import com.luckit.todo.controller.dto.AddTodoDto;
+import com.luckit.todo.controller.dto.GetTodoDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+
+@Tag(name = "Todo", description = "Todo API")
+public interface TodoControllerDocs {
+
+    @Operation(
+            summary = "미션 생성",
+            description = "미션 생성 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "mission successfully created",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> addTodo(
+            @RequestBody AddTodoDto addTodoDto
+    );
+
+    @Operation(
+            summary = "미션 조회",
+            description = "미션 조회 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "mission successfully retrieved",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = GetTodoDto.class)
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<List<GetTodoDto>> getTodo(
+            @PathVariable("goal_id") Integer goalId
+    );
+
+    @Operation(
+            summary = "미션 완료 상태 변경",
+            description = "미션 상태 변경 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully change mission status.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> completeTodo(
+            @PathVariable("todo_id") Integer todoId
+    );
+
+}
