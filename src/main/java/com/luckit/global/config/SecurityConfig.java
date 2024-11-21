@@ -33,7 +33,7 @@ public class SecurityConfig{
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/callback","/renew", "swagger-ui/**", "v3/api-docs/**").permitAll()
+                        .requestMatchers("/callback","/renew","api/**", "swagger-ui/**", "v3/api-docs/**").permitAll()
                         .requestMatchers("/","/profile").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN") // 관리자만 해당 URL에 접근 가능
                         .anyRequest().authenticated()
