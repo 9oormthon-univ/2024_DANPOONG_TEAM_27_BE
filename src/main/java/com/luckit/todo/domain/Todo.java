@@ -4,6 +4,8 @@ import com.luckit.goal.domain.Goal;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -21,6 +23,8 @@ public class Todo {
     private Goal goal;
 
     private String name;
+
+    private LocalDate date;
 
     private boolean idCompleted;
 

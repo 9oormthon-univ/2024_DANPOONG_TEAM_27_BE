@@ -2,8 +2,6 @@ package com.luckit.todo.service;
 
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
-import com.luckit.goal.controller.dto.AddGoalDto;
-import com.luckit.goal.controller.dto.GetGoalDto;
 import com.luckit.goal.domain.Goal;
 import com.luckit.goal.domain.GoalRepository;
 import com.luckit.todo.controller.dto.AddTodoDto;
@@ -13,6 +11,7 @@ import com.luckit.todo.domain.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +27,16 @@ public class TodoService {
         Goal goal = goalRepository.findById(addTodoDto.goalId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
 
+        LocalDate date = LocalDate.of(
+                addTodoDto.year(),
+                addTodoDto.month(),
+                addTodoDto.day()
+        );
+
         Todo todo = Todo.builder()
                 .goal(goal)
                 .name(addTodoDto.name())
+                .date(date)
                 .idCompleted(false)
                 .build();
 
@@ -47,8 +53,13 @@ public class TodoService {
 
         for (Todo todo : todoList) {
 
+            LocalDate date = todo.getDate();
+
             GetTodoDto dto = GetTodoDto.builder()
                     .todoId(todo.getId())
+                    .year(date.getYear())
+                    .month(date.getMonthValue())
+                    .day(date.getDayOfMonth())
                     .name(todo.getName())
                     .isCompleted(todo.isIdCompleted())
                     .build();

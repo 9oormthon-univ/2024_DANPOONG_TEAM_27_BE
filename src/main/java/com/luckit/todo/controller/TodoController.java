@@ -27,9 +27,9 @@ public class TodoController implements TodoControllerDocs {
 
     @GetMapping("/{goal_id}")
     public ApiResponseTemplate<List<GetTodoDto>> getTodo(
-            @PathVariable("goal_id") Integer goalId
-    ) {
-        return ApiResponseTemplate.success(SuccessCode.GET_TODO_SUCCESS, todoService.getTodo(goalId));
+            @PathVariable("goal_id") Integer goal_id
+            ) {
+        return ApiResponseTemplate.success(SuccessCode.GET_TODO_SUCCESS, todoService.getTodo(goal_id));
     }
 
     @PostMapping("/{todo_id}")
