@@ -1,7 +1,6 @@
 package com.luckit.todo.controller;
 
 import com.luckit.global.template.ApiResponseTemplate;
-import com.luckit.goal.controller.dto.GetGoalDto;
 import com.luckit.todo.controller.dto.AddTodoDto;
 import com.luckit.todo.controller.dto.GetTodoDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -55,7 +55,7 @@ public interface TodoControllerDocs {
             }
     )
     ApiResponseTemplate<List<GetTodoDto>> getTodo(
-            @PathVariable("goal_id") Integer goalId
+            @PathVariable("goal_id") Integer goal_id
     );
 
     @Operation(
