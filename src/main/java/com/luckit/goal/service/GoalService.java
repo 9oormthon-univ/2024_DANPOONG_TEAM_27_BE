@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class GoalService {
         Goal goal = Goal.builder()
                 .user(user)
                 .name(addGoalDto.name())
-                .isCompleted(addGoalDto.isCompleted())
+                .isCompleted(false)
                 .startDate(start_date)
                 .endDate(end_date)
                 .build();
@@ -81,5 +80,16 @@ public class GoalService {
         }
 
         return getGoalDtos;
+    }
+
+    public String completeGoal(Integer goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
+
+        goal.toggleCompleted();
+        goalRepository.save(goal);
+
+        return "Goal successfully completed.";
     }
 }

@@ -33,4 +33,11 @@ public class GoalController implements GoalControllerDocs {
         return ApiResponseTemplate.success(SuccessCode.GET_GOAL_SUCCESS, goalService.getGoal(Integer.parseInt(principal.getName())));
     }
 
+    @PostMapping("/{goal_id}")
+    public ApiResponseTemplate<String> completeGoal(
+            @PathVariable("goal_id") Integer goalId
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.COMPLETE_GOAL_SUCCESS, goalService.completeGoal(goalId));
+    }
+
 }
