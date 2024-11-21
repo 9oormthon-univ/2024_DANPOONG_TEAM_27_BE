@@ -38,3 +38,8 @@ oauth:
     admin-key: ${KAKAO_ADMIN_KEY}
     token-url: ${KAKAO_TOKEN_URL}
 
+deepl:
+    api:
+        key: ${DEEPL_API_KEY}
+        url: ${DEEPL_API_URL}
+
