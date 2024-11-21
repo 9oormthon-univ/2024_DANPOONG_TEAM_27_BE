@@ -2,7 +2,6 @@ package com.luckit.goal.controller.dto;
 
 public record AddGoalDto(
         String name,
-        boolean isCompleted,
         int start_date_year,
         int start_date_month,
         int start_date_day,

@@ -29,4 +29,8 @@ public class Goal {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    public void toggleCompleted() {
+        this.isCompleted = !this.isCompleted;
+    }
+
 }

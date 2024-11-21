@@ -1,10 +1,9 @@
-package com.luckit.goal.controller;
+package com.luckit.todo.controller;
 
-
-import com.luckit.global.dto.UserInfo;
 import com.luckit.global.template.ApiResponseTemplate;
-import com.luckit.goal.controller.dto.AddGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
+import com.luckit.todo.controller.dto.AddTodoDto;
+import com.luckit.todo.controller.dto.GetTodoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,19 +13,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.security.Principal;
 import java.util.List;
 
-@Tag(name = "Goal", description = "Goal API")
-public interface GoalControllerDocs {
+@Tag(name = "Todo", description = "Todo API")
+public interface TodoControllerDocs {
 
     @Operation(
-            summary = "목표 생성",
-            description = "목표 생성 API",
+            summary = "미션 생성",
+            description = "미션 생성 API",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Goal successfully created",
+                            description = "mission successfully created",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)
@@ -35,40 +33,38 @@ public interface GoalControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    ApiResponseTemplate<String> addGoal(
-            Principal principal,
-            @RequestBody AddGoalDto addGoalDto
+    ApiResponseTemplate<String> addTodo(
+            @RequestBody AddTodoDto addTodoDto
     );
 
-
     @Operation(
-            summary = "목표 조회",
-            description = "목표 조회 API",
+            summary = "미션 조회",
+            description = "미션 조회 API",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Successfully retrieved goal information.",
+                            description = "mission successfully retrieved",
                             content = @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema( // 배열 타입 명시
-                                            schema = @Schema(implementation = GetGoalDto.class) // 개별 요소의 스키마 정의
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = GetTodoDto.class)
                                     )
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    ApiResponseTemplate<List<GetGoalDto>> getGoal(
-            Principal principal
+    ApiResponseTemplate<List<GetTodoDto>> getTodo(
+            @PathVariable("goal_id") Integer goalId
     );
 
     @Operation(
-            summary = "목표 완료 상태 변경",
-            description = "목표 상태 변경 API",
+            summary = "미션 완료 상태 변경",
+            description = "미션 상태 변경 API",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Successfully change goal status.",
+                            description = "Successfully change mission status.",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = String.class)
@@ -77,7 +73,8 @@ public interface GoalControllerDocs {
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    ApiResponseTemplate<String> completeGoal(
-            @PathVariable("goal_id") Integer goalId
+    ApiResponseTemplate<String> completeTodo(
+            @PathVariable("todo_id") Integer todoId
     );
+
 }
