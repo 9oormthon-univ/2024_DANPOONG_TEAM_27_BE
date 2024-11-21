@@ -1,4 +1,4 @@
-package com.luckit.gpt.api.dto.request;
+package com.luckit.fortune.api.dto.request;
 
 import java.util.List;
 

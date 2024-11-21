@@ -1,7 +1,7 @@
-package com.luckit.gpt.api;
+package com.luckit.fortune.api;
 
-import com.luckit.gpt.api.dto.request.TranslationReqDto;
-import com.luckit.gpt.api.dto.response.TranslationResDto;
+import com.luckit.fortune.api.dto.request.TranslationReqDto;
+import com.luckit.fortune.api.dto.response.TranslationResDto;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
