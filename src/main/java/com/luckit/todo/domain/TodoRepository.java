@@ -18,6 +18,12 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
             "AND t.date = :date " +
             "AND t.idCompleted = true")
     int countCompletedTodosByUserIdAndDate(@Param("userId") Integer userId, @Param("date") LocalDate date);
+
+    @Query("SELECT COUNT(t) " +
+            "FROM Todo t " +
+            "WHERE t.goal.id = :goalId " +
+            "AND t.idCompleted = true")
+    int countCompletedTodosByGoalId(@Param("goalId") Integer goalId);
 }
 
 

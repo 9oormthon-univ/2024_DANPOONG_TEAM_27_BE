@@ -4,6 +4,7 @@ import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.goal.controller.dto.AddGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
+import com.luckit.goal.controller.dto.GetGoalMypageDto;
 import com.luckit.goal.domain.Goal;
 import com.luckit.goal.domain.GoalRepository;
 import com.luckit.todo.domain.Todo;
@@ -85,6 +86,30 @@ public class GoalService {
         return getGoalDtos;
     }
 
+
+    public List<GetGoalMypageDto> getGoalMypage(Integer userId) {
+
+        List<Goal> goalList = goalRepository.findAllByUser_UserId(userId);
+
+        List<GetGoalMypageDto> getGoalMypageDtos = new ArrayList<>();
+
+        for (Goal goal : goalList) {
+            int countSuccessTodo = todoRepository.countCompletedTodosByGoalId(goal.getId());
+
+            GetGoalMypageDto dto = GetGoalMypageDto.builder()
+                    .goalId(goal.getId())
+                    .name(goal.getName())
+                    .countSuccessTodo(countSuccessTodo)
+                    .build();
+
+            getGoalMypageDtos.add(dto);
+        }
+
+        return getGoalMypageDtos;
+
+
+    }
+
     public String completeGoal(Integer goalId) {
 
         Goal goal = goalRepository.findById(goalId)
@@ -104,4 +129,5 @@ public class GoalService {
 
         return "Goal successfully deleted.";
     }
+
 }
