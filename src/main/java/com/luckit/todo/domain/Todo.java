@@ -28,6 +28,8 @@ public class Todo {
 
     private boolean idCompleted;
 
+    private int animal;
+
     public void toggleCompleted() {
         this.idCompleted = !this.idCompleted;
     }
