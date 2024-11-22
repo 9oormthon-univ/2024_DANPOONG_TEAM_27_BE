@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +34,15 @@ public class TodoService {
                 addTodoDto.day()
         );
 
+        Random random = new Random();
+        int randomAnimal = random.nextInt(12) + 1;
+
         Todo todo = Todo.builder()
                 .goal(goal)
                 .name(addTodoDto.name())
                 .date(date)
                 .idCompleted(false)
+                .animal(randomAnimal)
                 .build();
 
         todoRepository.save(todo);
@@ -62,6 +67,7 @@ public class TodoService {
                     .day(date.getDayOfMonth())
                     .name(todo.getName())
                     .isCompleted(todo.isIdCompleted())
+                    .animal(todo.getAnimal())
                     .build();
 
             getTodoDtos.add(dto);
