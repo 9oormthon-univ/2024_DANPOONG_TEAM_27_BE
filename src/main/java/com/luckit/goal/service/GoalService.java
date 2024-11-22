@@ -6,6 +6,8 @@ import com.luckit.goal.controller.dto.AddGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
 import com.luckit.goal.domain.Goal;
 import com.luckit.goal.domain.GoalRepository;
+import com.luckit.todo.domain.Todo;
+import com.luckit.todo.domain.TodoRepository;
 import com.luckit.user.domain.User;
 import com.luckit.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoalService {
 
+    private final TodoRepository todoRepository;
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
 
@@ -91,5 +94,14 @@ public class GoalService {
         goalRepository.save(goal);
 
         return "Goal successfully completed.";
+    }
+
+    public String deleteGoal(Integer goalId) {
+
+        List<Todo> todos = todoRepository.findAllByGoalId(goalId);
+        todoRepository.deleteAll(todos);
+        goalRepository.deleteById(goalId);
+
+        return "Goal successfully deleted.";
     }
 }
