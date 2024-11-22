@@ -93,14 +93,20 @@ public class KakaoOAuthService {
                         .roleType(RoleType.ROLE_USER)
                         .build())
                 );
+        String message = user.getUserId() != null && userRepository.findByEmail(userInfo.email()).isPresent()
+                ? "기존에 있는 유저입니다."
+                : SuccessCode.LOGIN_MEMBER_SUCCESS.getMessage();
 
         String accessToken = tokenProvider.createAccessToken(user);
         String refreshToken = tokenProvider.createRefreshToken(user);
 
         tokenRenewService.saveRefreshToken(refreshToken, user.getUserId());
 
-        return ApiResponseTemplate.success(SuccessCode.LOGIN_MEMBER_SUCCESS,
-                AuthResDto.of(accessToken, refreshToken));
+        return ApiResponseTemplate.<AuthResDto>builder()
+                .status(SuccessCode.LOGIN_MEMBER_SUCCESS.getHttpStatus().value())
+                .message(message)
+                .data(AuthResDto.of(accessToken, refreshToken))
+                .build();
     }
 
     public UserInfo getUserInfo(String accessToken) {
