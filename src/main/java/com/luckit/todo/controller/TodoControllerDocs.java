@@ -99,7 +99,7 @@ public interface TodoControllerDocs {
 
     @Operation(
             summary = "미션 달성 그래프",
-            description = "미션 달성 그래프 API",
+            description = "미션 달성 그래프 API (ex. [1,2,3,4,5,6,7])",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
