@@ -93,4 +93,23 @@ public class TodoService {
 
         return "Todo successfully deleted.";
     }
+
+    public List<Integer> getTodoGraph(Integer userId, int year, int month) {
+
+        List<Integer> days = List.of(1, 5, 10, 15, 20, 25, 30);
+        List<Integer> result = new ArrayList<>();
+
+        for (int day : days) {
+            try {
+                LocalDate date = LocalDate.of(year, month, day);
+                int count = todoRepository.countCompletedTodosByUserIdAndDate(userId, date);
+                result.add(count);
+            } catch (Exception e) {
+                // 날짜가 안맞으면 (예를 들어, 2월은 30일 없으니깐)
+                result.add(0);
+            }
+        }
+
+        return result;
+    }
 }

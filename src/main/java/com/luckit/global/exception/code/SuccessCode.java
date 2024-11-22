@@ -31,6 +31,7 @@ public enum SuccessCode {
     GET_TODO_SUCCESS(HttpStatus.OK, "미션 조회를 성공했습니다."),
     COMPLETE_TODO_SUCCESS(HttpStatus.OK, "미션 완료를 성공했습니다."),
     DELETE_TODO_SUCCESS(HttpStatus.OK, "미션 삭제를 성공했습니다."),
+    GET_TODO_GRAPH_SUCCESS(HttpStatus.OK, "미션 그래프 조회에 성공했습니다."),
 
     // 201 Created
     CREATE_MEMBER_SUCCESS(HttpStatus.CREATED, "회원가입에 성공했습니다."),
