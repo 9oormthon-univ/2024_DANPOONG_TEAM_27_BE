@@ -86,4 +86,13 @@ public class TodoService {
 
         return "Todo successfully completed.";
     }
+
+    public String deleteTodo(Integer todoId) {
+
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_TODO_ERROR, ErrorCode.NO_TODO_ERROR.getMessage()));
+
+        todoRepository.delete(todo);
+        return "Todo successfully deleted.";
+    }
 }

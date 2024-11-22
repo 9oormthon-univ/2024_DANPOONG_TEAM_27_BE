@@ -77,4 +77,23 @@ public interface TodoControllerDocs {
             @PathVariable("todo_id") Integer todoId
     );
 
+    @Operation(
+            summary = "미션 삭제",
+            description = "미션 삭제 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully delete mission",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> deleteTodo(
+            @PathVariable("todo_id") Integer todoId
+    );
+
 }
