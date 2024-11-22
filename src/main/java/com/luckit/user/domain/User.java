@@ -34,6 +34,8 @@ public class User {
 
     private LocalDateTime date_of_birth;
 
+    private boolean unknownTime;
+
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
 

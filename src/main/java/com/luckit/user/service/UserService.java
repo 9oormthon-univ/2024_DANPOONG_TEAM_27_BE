@@ -48,6 +48,7 @@ public class UserService {
                 .gender(gender)
                 .solarOrLunar(solarOrLunar)
                 .date_of_birth(dateOfBirth)
+                .unknownTime(requestDto.unknownTime())
                 .build();
 
         // 4. 사용자 정보 저장
@@ -72,6 +73,7 @@ public class UserService {
                 .day(dateOfBirth.getDayOfMonth())
                 .hour(dateOfBirth.getHour())
                 .minute(dateOfBirth.getMinute())
+                .unknownTime(user.isUnknownTime())
                 .build();
     }
 }
