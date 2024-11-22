@@ -26,7 +26,7 @@ public class FortuneController {
     @GetMapping
     @Operation(
             summary = "유저의 온보딩 목표를 생성",
-            description = "특정 유저의 온보딩 목표를 생성합니다.",
+            description = "회원가입한 유저의 온보딩 목표를 생성합니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "목표 생성을 성공했습니다.")
             }
