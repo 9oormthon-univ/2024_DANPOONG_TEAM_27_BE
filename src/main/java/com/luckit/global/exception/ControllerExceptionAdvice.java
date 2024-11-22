@@ -59,6 +59,15 @@ public class ControllerExceptionAdvice {
                 .body(ApiResponseTemplate.error(ErrorCode.JSON_SYNTAX_ERROR));
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponseTemplate<String>> handleGeneralException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponseTemplate.<String>error(ErrorCode.UNDEFINED_ERROR)
+                        .toBuilder()
+                        .data(e.getMessage())
+                        .build());
+    }
+
     private static String getEnumValues(Class<?> enumClass) {
         if (!enumClass.isEnum()) {
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE, ErrorCode.INVALID_ENUM_VALUE.getMessage());

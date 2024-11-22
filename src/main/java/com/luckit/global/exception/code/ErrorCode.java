@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     NO_GOAL_ERROR(HttpStatus.BAD_REQUEST, "해당 목표가 존재하지 않습니다."),
     NO_TODO_ERROR(HttpStatus.BAD_REQUEST, "해당 미션이 존재하지 않습니다."),
+    UNDEFINED_ERROR(HttpStatus.BAD_REQUEST, "정의되지 않은 오류가 발생했습니다."),
 
 
     // 401 Unauthorized
