@@ -5,6 +5,7 @@ import com.luckit.global.dto.UserInfo;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.goal.controller.dto.AddGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
+import com.luckit.goal.controller.dto.GetGoalMypageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -59,6 +60,27 @@ public interface GoalControllerDocs {
             }
     )
     ApiResponseTemplate<List<GetGoalDto>> getGoal(
+            Principal principal
+    );
+
+    @Operation(
+            summary = "목표 목록 조회 (마이페이지)",
+            description = "목표 목록 조회 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully retrieved goal information.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema( // 배열 타입 명시
+                                            schema = @Schema(implementation = GetGoalMypageDto.class) // 개별 요소의 스키마 정의
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<List<GetGoalMypageDto>> getGoalMypage(
             Principal principal
     );
 
