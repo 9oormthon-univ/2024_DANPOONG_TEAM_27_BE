@@ -9,6 +9,7 @@ public record GetTodoDto(
         int year,
         int month,
         int day,
-        boolean isCompleted
+        boolean isCompleted,
+        int animal
 ) {
 }
