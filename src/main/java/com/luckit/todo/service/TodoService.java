@@ -28,11 +28,6 @@ public class TodoService {
         Goal goal = goalRepository.findById(addTodoDto.goalId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
 
-        LocalDate date = LocalDate.of(
-                addTodoDto.year(),
-                addTodoDto.month(),
-                addTodoDto.day()
-        );
 
         Random random = new Random();
         int randomAnimal = random.nextInt(12) + 1;
@@ -40,7 +35,6 @@ public class TodoService {
         Todo todo = Todo.builder()
                 .goal(goal)
                 .name(addTodoDto.name())
-                .date(date)
                 .idCompleted(false)
                 .animal(randomAnimal)
                 .build();
