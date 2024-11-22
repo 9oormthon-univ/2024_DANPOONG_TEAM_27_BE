@@ -9,4 +9,5 @@ public interface GoalRepository extends JpaRepository<Goal, Integer> {
 
     List<Goal> findAllByUser(User user);
 
+    List<Goal> findAllByUser_UserId(Integer id);
 }

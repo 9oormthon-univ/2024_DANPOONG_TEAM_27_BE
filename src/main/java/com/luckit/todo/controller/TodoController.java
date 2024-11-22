@@ -9,6 +9,7 @@ import com.luckit.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -21,14 +22,14 @@ public class TodoController implements TodoControllerDocs {
     @PostMapping
     public ApiResponseTemplate<String> addTodo(
             @RequestBody AddTodoDto addTodoDto
-            ) {
+    ) {
         return ApiResponseTemplate.success(SuccessCode.ADD_TODO_SUCCESS, todoService.addTodo(addTodoDto));
     }
 
     @GetMapping("/{goal_id}")
     public ApiResponseTemplate<List<GetTodoDto>> getTodo(
             @PathVariable("goal_id") Integer goal_id
-            ) {
+    ) {
         return ApiResponseTemplate.success(SuccessCode.GET_TODO_SUCCESS, todoService.getTodo(goal_id));
     }
 
@@ -39,4 +40,20 @@ public class TodoController implements TodoControllerDocs {
         return ApiResponseTemplate.success(SuccessCode.COMPLETE_TODO_SUCCESS, todoService.completeTodo(todoId));
     }
 
+    @DeleteMapping("/{todo_id}")
+    public ApiResponseTemplate<String> deleteTodo(
+            @PathVariable("todo_id") Integer todoId
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.DELETE_TODO_SUCCESS, todoService.deleteTodo(todoId));
+    }
+
+
+    @GetMapping("/graph")
+    public ApiResponseTemplate<List<Integer>> getTodoGraph(
+            Principal principal,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.GET_TODO_GRAPH_SUCCESS, todoService.getTodoGraph(Integer.parseInt(principal.getName()), year, month));
+    }
 }

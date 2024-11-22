@@ -4,8 +4,10 @@ import com.luckit.global.exception.code.SuccessCode;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.goal.controller.dto.AddGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
+import com.luckit.goal.controller.dto.GetGoalMypageDto;
 import com.luckit.goal.service.GoalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -33,11 +35,27 @@ public class GoalController implements GoalControllerDocs {
         return ApiResponseTemplate.success(SuccessCode.GET_GOAL_SUCCESS, goalService.getGoal(Integer.parseInt(principal.getName())));
     }
 
+    @GetMapping("/mypage")
+    public ApiResponseTemplate<List<GetGoalMypageDto>> getGoalMypage(
+            Principal principal
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.GET_GOAL_MYPAGE_SUCCESS, goalService.getGoalMypage(Integer.parseInt(principal.getName())));
+    }
+
     @PostMapping("/{goal_id}")
     public ApiResponseTemplate<String> completeGoal(
             @PathVariable("goal_id") Integer goalId
     ) {
         return ApiResponseTemplate.success(SuccessCode.COMPLETE_GOAL_SUCCESS, goalService.completeGoal(goalId));
     }
+
+    @DeleteMapping("/{goal_id}")
+    public ApiResponseTemplate<String> deleteGoal(
+            @PathVariable("goal_id") Integer goalId
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.DELETE_GOAL_SUCCESS, goalService.deleteGoal(goalId));
+    }
+
+
 
 }
