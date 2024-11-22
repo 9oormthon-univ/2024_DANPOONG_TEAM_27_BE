@@ -80,4 +80,23 @@ public interface GoalControllerDocs {
     ApiResponseTemplate<String> completeGoal(
             @PathVariable("goal_id") Integer goalId
     );
+
+    @Operation(
+            summary = "목표 삭제",
+            description = "목표 삭제 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully delete goal.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> deleteGoal(
+            @PathVariable("goal_id") Integer goalId
+    );
 }

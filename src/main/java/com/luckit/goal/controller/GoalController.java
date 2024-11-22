@@ -40,4 +40,11 @@ public class GoalController implements GoalControllerDocs {
         return ApiResponseTemplate.success(SuccessCode.COMPLETE_GOAL_SUCCESS, goalService.completeGoal(goalId));
     }
 
+    @DeleteMapping("{goal_id}")
+    public ApiResponseTemplate<String> deleteGoal(
+            @PathVariable("goal_id") Integer goalId
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.DELETE_GOAL_SUCCESS, goalService.deleteGoal(goalId));
+    }
+
 }

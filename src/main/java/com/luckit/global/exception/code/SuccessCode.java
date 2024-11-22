@@ -25,6 +25,7 @@ public enum SuccessCode {
     ADD_GOAL_SUCCESS(HttpStatus.OK, "목표 생성을 성공했습니다."),
     GET_GOAL_SUCCESS(HttpStatus.OK, "목표 조회를 성공했습니다."),
     COMPLETE_GOAL_SUCCESS(HttpStatus.OK, "목표 완료를 성공했습니다."),
+    DELETE_GOAL_SUCCESS(HttpStatus.OK, "목표 삭제를 성공했습니다."),
 
     ADD_TODO_SUCCESS(HttpStatus.OK, "미션 생성을 성공했습니다."),
     GET_TODO_SUCCESS(HttpStatus.OK, "미션 조회를 성공했습니다."),
