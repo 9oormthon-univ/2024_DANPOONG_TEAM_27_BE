@@ -3,11 +3,14 @@ package com.luckit.todo.domain;
 import com.luckit.goal.domain.Goal;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class) // Auditing 활성화
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 @Builder
@@ -24,6 +27,7 @@ public class Todo {
 
     private String name;
 
+    @CreatedDate
     private LocalDate date;
 
     private boolean idCompleted;
