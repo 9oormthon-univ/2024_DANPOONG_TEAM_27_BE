@@ -9,6 +9,7 @@ import com.luckit.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -44,7 +45,15 @@ public class TodoController implements TodoControllerDocs {
             @PathVariable("todo_id") Integer todoId
     ) {
         return ApiResponseTemplate.success(SuccessCode.DELETE_TODO_SUCCESS, todoService.deleteTodo(todoId));
+    }
 
 
+    @GetMapping("/graph")
+    public ApiResponseTemplate<List<Integer>> getTodoGraph(
+            Principal principal,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.GET_TODO_GRAPH_SUCCESS, todoService.getTodoGraph(Integer.parseInt(principal.getName()), year, month));
     }
 }

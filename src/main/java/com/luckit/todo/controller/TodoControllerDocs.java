@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.List;
 
 @Tag(name = "Todo", description = "Todo API")
@@ -94,6 +95,29 @@ public interface TodoControllerDocs {
     )
     ApiResponseTemplate<String> deleteTodo(
             @PathVariable("todo_id") Integer todoId
+    );
+
+    @Operation(
+            summary = "미션 달성 그래프",
+            description = "미션 달성 그래프 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully get mission graph.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = Integer.class)
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<List<Integer>> getTodoGraph(
+            Principal principal,
+            @RequestParam int year,
+            @RequestParam int month
     );
 
 }
