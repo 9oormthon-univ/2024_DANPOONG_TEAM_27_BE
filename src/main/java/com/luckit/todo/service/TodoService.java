@@ -86,4 +86,11 @@ public class TodoService {
 
         return "Todo successfully completed.";
     }
+
+    public String deleteTodo(Integer todoId) {
+
+        todoRepository.deleteById(todoId);
+
+        return "Todo successfully deleted.";
+    }
 }
