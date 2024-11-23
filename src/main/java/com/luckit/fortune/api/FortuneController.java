@@ -1,6 +1,6 @@
 package com.luckit.fortune.api;
 
-import com.luckit.fortune.api.application.FortuneService;
+import com.luckit.fortune.application.FortuneService;
 import com.luckit.fortune.api.dto.response.GoalPeriod;
 import com.luckit.fortune.api.dto.response.UserFortuneResponseDto;
 import com.luckit.global.template.ApiResponseTemplate;
