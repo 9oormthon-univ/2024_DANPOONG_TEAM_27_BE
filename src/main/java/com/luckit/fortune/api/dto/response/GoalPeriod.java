@@ -1,3 +1,3 @@
 package com.luckit.fortune.api.dto.response;
 
-public  record GoalPeriod(String goals, String period) {}
+public record GoalPeriod(String goals, String period) {}

@@ -6,11 +6,13 @@ import com.luckit.fortune.api.dto.response.GoalPeriod;
 import com.luckit.fortune.api.dto.response.UserFortuneResponseDto;
 import com.luckit.fortune.domain.Fortune;
 import com.luckit.fortune.domain.FortuneRepository;
+import com.luckit.fortune.api.dto.response.UserMissionResDto;
 import com.luckit.fortune.domain.Message;
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.global.exception.code.SuccessCode;
 import com.luckit.global.template.ApiResponseTemplate;
+import com.luckit.goal.service.GoalService;
 import com.luckit.user.domain.User;
 import com.luckit.user.domain.UserRepository;
 import jakarta.transaction.Transactional;
@@ -42,6 +44,7 @@ public class FortuneService {
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
     private final FortuneRepository fortuneRepository;
+    private final GoalService goalService;
 
     @Value("${openai.api.url}")
     private String apiURL;
@@ -280,4 +283,126 @@ public class FortuneService {
         }
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract time of day scores from response.");
     }
+
+    @Transactional
+    public ApiResponseTemplate<List<UserMissionResDto>> createDailyMission(Principal principal) {
+        Integer userId = Integer.parseInt(principal.getName());
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
+                        ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
+
+        String prompt = generateMissionPrompt(user);
+        String translatedPrompt = translationService.translate(prompt, "EN");
+
+        FortuneReqDto reqDto = new FortuneReqDto(model, List.of(new com.luckit.fortune.domain.Message("user", translatedPrompt)));
+        FortuneResDto resDto = restTemplate.postForObject(apiURL, reqDto, FortuneResDto.class);
+
+        if (resDto == null || resDto.choices().isEmpty()) {
+            throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION,
+                    ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION.getMessage());
+        }
+
+        FortuneResDto.Choice choice = resDto.choices().get(0);
+        String responseInEN = choice.message().content();
+
+        logger.info("GPT Response in English: {}", responseInEN);
+
+        String translatedResponseToKO = translationService.translate(responseInEN, "KO");
+        logger.info("Translated Response in Korean: {}", translatedResponseToKO);
+
+        List<UserMissionResDto> missionResDto = parseMissionResponse(translatedResponseToKO);
+
+        return ApiResponseTemplate.success(SuccessCode.GET_USER_MISSION_SUCCESS, missionResDto);
+    }
+
+    private String generateMissionPrompt(User user) {
+        return String.format(
+                "You need to provide a mission to increase your property based on your target '%s'. Please keep your response format strict as follows.\n" +
+                        "Include the following information:\n" +
+                        "1. **Mission name**: The name of the mission.\n" +
+                        "2. **That type**: Please use one of the following types: LOVE, MONEY, CAREER, STUDY, HEALTH.\n" +
+                        "   Provide the type followed by a score (e.g., LOVE 10 points). Each mission should only have one type with one score.\n" +
+                        "Provide one or more missions in the exact format without any additional details.",
+                goalService.getGoal(user.getUserId())
+        );
+    }
+
+    private List<UserMissionResDto> parseMissionResponse(String response) {
+        String[] lines = response.split("\\R");
+        List<UserMissionResDto> missionList = new ArrayList<>();
+
+        String missionName = null;
+        Map<UserMissionResDto.FortuneType, Integer> scores = new HashMap<>();
+
+        Map<String, UserMissionResDto.FortuneType> typeTranslationMap = new HashMap<>();
+        typeTranslationMap.put("사랑", UserMissionResDto.FortuneType.LOVE);
+        typeTranslationMap.put("건강", UserMissionResDto.FortuneType.HEALTH);
+        typeTranslationMap.put("커리어", UserMissionResDto.FortuneType.CAREER);
+        typeTranslationMap.put("경력", UserMissionResDto.FortuneType.CAREER);
+        typeTranslationMap.put("공부", UserMissionResDto.FortuneType.STUDY);
+        typeTranslationMap.put("LOVE", UserMissionResDto.FortuneType.LOVE);
+        typeTranslationMap.put("HEALTH", UserMissionResDto.FortuneType.HEALTH);
+        typeTranslationMap.put("CAREER", UserMissionResDto.FortuneType.CAREER);
+        typeTranslationMap.put("STUDY", UserMissionResDto.FortuneType.STUDY);
+
+        for (String line : lines) {
+            line = line.trim();
+            logger.info("Processing line: {}", line);
+
+            if (line.contains("**미션 이름**") || line.contains("**Mission name**")) {
+                String[] splitLine = line.split("\\*\\*미션 이름\\*\\*: |\\*\\*Mission name\\*\\*: ");
+                if (splitLine.length > 1) {
+                    missionName = splitLine[1].trim();
+                    logger.info("Extracted Mission Name: {}", missionName);
+                }
+            }
+            else if (line.contains("**유형**") || line.contains("**그 유형**") || line.contains("**Type**") || line.contains("**That type**")) {
+                String[] splitLine = line.split("\\*\\*(유형|그 유형|Type|That type)\\*\\*: ");
+                if (splitLine.length > 1) {
+                    String[] typeAndPoints = splitLine[1].split(" ");
+                    if (typeAndPoints.length >= 2) {
+                        String fortuneTypeStr = typeAndPoints[0].toUpperCase().trim();
+
+                        if (typeTranslationMap.containsKey(fortuneTypeStr)) {
+                            fortuneTypeStr = typeTranslationMap.get(fortuneTypeStr).name();
+                        }
+
+                        String pointsStr = typeAndPoints[1].replaceAll("[^\\d]", "").trim();
+                        if (!pointsStr.isEmpty()) {
+                            Integer fortunePoints = Integer.parseInt(pointsStr);
+
+                            try {
+                                UserMissionResDto.FortuneType fortuneType = UserMissionResDto.FortuneType.valueOf(fortuneTypeStr);
+                                scores.put(fortuneType, fortunePoints);
+                                logger.info("Extracted Type: {}, Points: {}", fortuneType, fortunePoints);
+                            } catch (IllegalArgumentException e) {
+                                throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Invalid fortune type in response: " + fortuneTypeStr);
+                            }
+                        } else {
+                            logger.warn("Points value is empty or invalid for line: {}", line);
+                        }
+                    } else {
+                        logger.warn("Type and points format is unexpected for line: {}", line);
+                    }
+                }
+
+                if (missionName != null && !scores.isEmpty()) {
+                    UserMissionResDto mission = new UserMissionResDto(missionName, scores);
+                    missionList.add(mission);
+                    logger.info("Added Mission: {}", mission);
+
+                    missionName = null;
+                    scores = new HashMap<>();
+                }
+            }
+        }
+
+        if (missionList.isEmpty()) {
+            throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract mission from response.");
+        }
+
+        return missionList;
+    }
+
 }
+
