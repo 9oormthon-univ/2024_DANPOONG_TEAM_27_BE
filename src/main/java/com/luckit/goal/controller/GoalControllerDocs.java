@@ -4,6 +4,7 @@ package com.luckit.goal.controller;
 import com.luckit.global.dto.UserInfo;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.goal.controller.dto.AddGoalDto;
+import com.luckit.goal.controller.dto.CompleteGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
 import com.luckit.goal.controller.dto.GetGoalMypageDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,6 +86,27 @@ public interface GoalControllerDocs {
     );
 
     @Operation(
+            summary = "목표 개별 조회 (마이페이지)",
+            description = "목표 개별 조회 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully retrieved goal information.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema( // 배열 타입 명시
+                                            schema = @Schema(implementation = Integer.class)
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<List<Integer>> getEachGoalMypage(
+            @PathVariable("goal_id") Integer goalId
+    );
+
+    @Operation(
             summary = "목표 완료 상태 변경",
             description = "목표 상태 변경 API",
             responses = {
@@ -93,13 +115,13 @@ public interface GoalControllerDocs {
                             description = "Successfully change goal status.",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = CompleteGoalDto.class)
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    ApiResponseTemplate<String> completeGoal(
+    ApiResponseTemplate<CompleteGoalDto> completeGoal(
             @PathVariable("goal_id") Integer goalId
     );
 

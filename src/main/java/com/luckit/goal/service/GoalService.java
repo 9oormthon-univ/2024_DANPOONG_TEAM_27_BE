@@ -3,6 +3,7 @@ package com.luckit.goal.service;
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.goal.controller.dto.AddGoalDto;
+import com.luckit.goal.controller.dto.CompleteGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
 import com.luckit.goal.controller.dto.GetGoalMypageDto;
 import com.luckit.goal.domain.Goal;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -110,15 +113,73 @@ public class GoalService {
 
     }
 
-    public String completeGoal(Integer goalId) {
+
+    public List<Integer> getEachGoalMypage(Integer goalId) {
+
+        List<Todo> completeTodoList = todoRepository.findCompletedTodosByGoalId(goalId);
+
+        List<Integer> countAnimals = new ArrayList<>();
+
+        for (int i = 0; i < 12; i++) {
+            countAnimals.add(0);
+        }
+
+        for (Todo todo : completeTodoList) {
+            int index = todo.getAnimal() - 1;
+            countAnimals.set(index, countAnimals.get(index) + 1);
+        }
+
+        return countAnimals;
+    }
+
+    public CompleteGoalDto completeGoal(Integer goalId) {
 
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
 
+        List<Todo> completeTodoList = todoRepository.findCompletedTodosByGoalId(goal.getId());
+
         goal.toggleCompleted();
         goalRepository.save(goal);
 
-        return "Goal successfully completed.";
+        LocalDate start_date = goal.getStartDate();
+        LocalDate end_date = goal.getEndDate();
+
+        List<Integer> countAnimals = new ArrayList<>();
+
+        for (int i = 0; i < 12; i++) {
+            countAnimals.add(0);
+        }
+
+        for (Todo todo : completeTodoList) {
+            int index = todo.getAnimal() - 1;
+            countAnimals.set(index, countAnimals.get(index) + 1);
+        }
+
+        int maxValue = Collections.max(countAnimals); // 최대값 찾기
+
+        List<Integer> maxIndexes = new ArrayList<>();
+        for (int i = 0; i < countAnimals.size(); i++) {
+            if (countAnimals.get(i) == maxValue) {
+                maxIndexes.add(i);
+            }
+        }
+
+        Random random = new Random();
+        int randomIndex = random.nextInt(maxIndexes.size());
+        int randomElement = maxIndexes.get(randomIndex);
+
+        return CompleteGoalDto.builder()
+                .evolvedAnimals(randomElement+1)
+                .start_date_year(start_date.getYear())
+                .start_date_month(start_date.getMonthValue())
+                .start_date_day(start_date.getDayOfMonth())
+                .end_date_year(end_date.getYear())
+                .end_date_month(end_date.getMonthValue())
+                .end_date_day(end_date.getDayOfMonth())
+                .countSuccessTodo(completeTodoList.size())
+                .countAnimals(countAnimals)
+                .build();
     }
 
     public String deleteGoal(Integer goalId) {
