@@ -21,8 +21,12 @@ public record UserFortuneResponseDto(
     }
 
     private static Integer calculateOverallFortuneScore(Map<String, Integer> timeOfDayFortuneScores) {
+        if (timeOfDayFortuneScores == null || timeOfDayFortuneScores.isEmpty()) {
+            return 0;
+        }
         return timeOfDayFortuneScores.values().stream()
                 .mapToInt(Integer::intValue)
                 .sum() / timeOfDayFortuneScores.size();
     }
+
 }
