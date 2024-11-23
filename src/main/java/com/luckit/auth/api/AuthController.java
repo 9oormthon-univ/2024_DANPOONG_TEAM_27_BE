@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @RequestMapping("/api/v1")
 @Tag(name = "회원가입/로그인", description = "회원가입/로그인을 담당하는 api 그룹")
-@RequestMapping("/api/v1")
 public class AuthController {
 
     private final KakaoOAuthService kakaoOAuthService;
