@@ -35,6 +35,7 @@ public enum SuccessCode {
     COMPLETE_TODO_SUCCESS(HttpStatus.OK, "미션 완료를 성공했습니다."),
     DELETE_TODO_SUCCESS(HttpStatus.OK, "미션 삭제를 성공했습니다."),
     GET_TODO_GRAPH_SUCCESS(HttpStatus.OK, "미션 그래프 조회에 성공했습니다."),
+    UPDATE_TODO_SUCCESS(HttpStatus.OK, "미션 수정에 성공했습니다"),
 
     GET_FORTUNE_SUCCESS(HttpStatus.OK, "운세 조회에 성공했습니다."),
 

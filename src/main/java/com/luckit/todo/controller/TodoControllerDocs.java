@@ -3,6 +3,7 @@ package com.luckit.todo.controller;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.todo.controller.dto.AddTodoDto;
 import com.luckit.todo.controller.dto.GetTodoDto;
+import com.luckit.todo.controller.dto.UpdateTodoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -119,6 +120,26 @@ public interface TodoControllerDocs {
             Principal principal,
             @RequestParam int year,
             @RequestParam int month
+    );
+
+    @Operation(
+            summary = "미션 수정",
+            description = "미션 수정 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully get mission graph.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> updateTodo(
+            @RequestBody UpdateTodoDto updateTodoDto
     );
 
 }

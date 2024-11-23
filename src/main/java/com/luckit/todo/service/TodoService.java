@@ -8,6 +8,7 @@ import com.luckit.goal.domain.Goal;
 import com.luckit.goal.domain.GoalRepository;
 import com.luckit.todo.controller.dto.AddTodoDto;
 import com.luckit.todo.controller.dto.GetTodoDto;
+import com.luckit.todo.controller.dto.UpdateTodoDto;
 import com.luckit.todo.domain.Todo;
 import com.luckit.todo.domain.TodoRepository;
 import lombok.RequiredArgsConstructor;
@@ -157,5 +158,17 @@ public class TodoService {
         }
 
         return result;
+    }
+
+    public String updateTodo(UpdateTodoDto updateTodoDto) {
+
+        Todo todo = todoRepository.findById(updateTodoDto.todoId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_TODO_ERROR, ErrorCode.NO_TODO_ERROR.getMessage()));
+
+        todo.updateName(updateTodoDto.name());
+
+        todoRepository.save(todo);
+
+        return "Todo successfully updated.";
     }
 }
