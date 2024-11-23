@@ -11,7 +11,6 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
 
     List<Todo> findAllByGoalId(Integer goalId);
 
-
     @Query("SELECT COUNT(t) " +
             "FROM Todo t " +
             "WHERE t.goal.user.userId = :userId " +
@@ -24,6 +23,12 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
             "WHERE t.goal.id = :goalId " +
             "AND t.idCompleted = true")
     int countCompletedTodosByGoalId(@Param("goalId") Integer goalId);
+
+    @Query("SELECT t " +
+            "FROM Todo t " +
+            "WHERE t.goal.id = :goalId " +
+            "AND t.idCompleted = true")
+    List<Todo> findCompletedTodosByGoalId(@Param("goalId") Integer goalId);
 }
 
 
