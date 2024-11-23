@@ -332,6 +332,8 @@ public class FortuneService {
         typeTranslationMap.put("경력", UserMissionResDto.FortuneType.CAREER);
         typeTranslationMap.put("공부", UserMissionResDto.FortuneType.STUDY);
         typeTranslationMap.put("돈", UserMissionResDto.FortuneType.MONEY);
+        typeTranslationMap.put("학습", UserMissionResDto.FortuneType.STUDY);
+        typeTranslationMap.put("연구", UserMissionResDto.FortuneType.STUDY);
         typeTranslationMap.put("LOVE", UserMissionResDto.FortuneType.LOVE);
         typeTranslationMap.put("HEALTH", UserMissionResDto.FortuneType.HEALTH);
         typeTranslationMap.put("CAREER", UserMissionResDto.FortuneType.CAREER);
