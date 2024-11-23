@@ -43,6 +43,13 @@ public class GoalController implements GoalControllerDocs {
         return ApiResponseTemplate.success(SuccessCode.GET_GOAL_MYPAGE_SUCCESS, goalService.getGoalMypage(Integer.parseInt(principal.getName())));
     }
 
+    @GetMapping("/mypage/{goal_id}")
+    public ApiResponseTemplate<List<Integer>> getEachGoalMypage(
+            @PathVariable("goal_id") Integer goalId
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.GET_EACH_GOAL_MYPAGE_SUCCESS, goalService.getEachGoalMypage(goalId));
+    }
+
     @PostMapping("/{goal_id}")
     public ApiResponseTemplate<CompleteGoalDto> completeGoal(
             @PathVariable("goal_id") Integer goalId
