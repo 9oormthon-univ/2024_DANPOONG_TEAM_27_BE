@@ -1,4 +1,4 @@
-package com.luckit.fortune.api.application;
+package com.luckit.fortune.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.luckit.fortune.api.dto.request.TranslationReqDto;
