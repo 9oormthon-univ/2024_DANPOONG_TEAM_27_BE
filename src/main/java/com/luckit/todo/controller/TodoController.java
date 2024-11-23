@@ -5,6 +5,7 @@ import com.luckit.global.exception.code.SuccessCode;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.todo.controller.dto.AddTodoDto;
 import com.luckit.todo.controller.dto.GetTodoDto;
+import com.luckit.todo.controller.dto.UpdateTodoDto;
 import com.luckit.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -56,5 +57,12 @@ public class TodoController implements TodoControllerDocs {
             @RequestParam int month
     ) {
         return ApiResponseTemplate.success(SuccessCode.GET_TODO_GRAPH_SUCCESS, todoService.getTodoGraph(Integer.parseInt(principal.getName()), year, month));
+    }
+
+    @PostMapping("/update")
+    public ApiResponseTemplate<String> updateTodo(
+            @RequestBody UpdateTodoDto updateTodoDto
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.UPDATE_TODO_SUCCESS, todoService.updateTodo(updateTodoDto));
     }
 }

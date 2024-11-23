@@ -1,5 +1,7 @@
 package com.luckit.todo.domain;
 
+import com.luckit.global.exception.CustomException;
+import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.goal.domain.Goal;
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,6 +44,14 @@ public class Todo {
 
     public void toggleCompleted() {
         this.isCompleted = !this.isCompleted;
+    }
+
+    // Name 수정 메서드
+    public void updateName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.EMPTY_NEW_TODO_ERROR, ErrorCode.EXPIRED_TOKEN_EXCEPTION.getMessage());
+        }
+        this.name = name.trim();
     }
 
 }
