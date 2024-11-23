@@ -4,6 +4,7 @@ import com.luckit.global.exception.code.SuccessCode;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.goal.controller.dto.*;
 import com.luckit.goal.service.GoalService;
+import com.luckit.todo.controller.dto.UpdateTodoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,11 @@ public class GoalController implements GoalControllerDocs {
         return ApiResponseTemplate.success(SuccessCode.DELETE_GOAL_SUCCESS, goalService.deleteGoal(goalId));
     }
 
-
+    @PostMapping("/update")
+    public ApiResponseTemplate<String> updateGoal(
+            @RequestBody UpdateTodoDto updateTodoDto
+    ) {
+        return ApiResponseTemplate.success(SuccessCode.UPDATE_GOAL_SUCCESS, goalService.updateGoal(updateTodoDto));
+    }
 
 }
