@@ -30,12 +30,18 @@ public class Todo {
     @CreatedDate
     private LocalDate date;
 
-    private boolean idCompleted;
+    private boolean isCompleted;
+
+    private boolean isMadeByGpt;
+
+    private String fortuneType;
+
+    private int score;
 
     private int animal;
 
     public void toggleCompleted() {
-        this.idCompleted = !this.idCompleted;
+        this.isCompleted = !this.isCompleted;
     }
 
 }

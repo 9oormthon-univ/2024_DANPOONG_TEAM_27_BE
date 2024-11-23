@@ -3,10 +3,7 @@ package com.luckit.goal.controller;
 
 import com.luckit.global.dto.UserInfo;
 import com.luckit.global.template.ApiResponseTemplate;
-import com.luckit.goal.controller.dto.AddGoalDto;
-import com.luckit.goal.controller.dto.CompleteGoalDto;
-import com.luckit.goal.controller.dto.GetGoalDto;
-import com.luckit.goal.controller.dto.GetGoalMypageDto;
+import com.luckit.goal.controller.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -94,15 +91,13 @@ public interface GoalControllerDocs {
                             description = "Successfully retrieved goal information.",
                             content = @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema( // 배열 타입 명시
-                                            schema = @Schema(implementation = Integer.class)
-                                    )
+                                    schema = @Schema(implementation = GetEachGoalMypageDto.class)
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    ApiResponseTemplate<List<Integer>> getEachGoalMypage(
+    ApiResponseTemplate<GetEachGoalMypageDto> getEachGoalMypage(
             @PathVariable("goal_id") Integer goalId
     );
 
