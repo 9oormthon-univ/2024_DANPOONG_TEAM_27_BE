@@ -4,6 +4,8 @@ import com.luckit.fortune.api.dto.request.FortuneReqDto;
 import com.luckit.fortune.api.dto.response.FortuneResDto;
 import com.luckit.fortune.api.dto.response.GoalPeriod;
 import com.luckit.fortune.api.dto.response.UserFortuneResponseDto;
+import com.luckit.fortune.domain.Fortune;
+import com.luckit.fortune.domain.FortuneRepository;
 import com.luckit.fortune.api.dto.response.UserMissionResDto;
 import com.luckit.fortune.domain.Message;
 import com.luckit.global.exception.CustomException;
@@ -15,7 +17,12 @@ import com.luckit.user.domain.User;
 import com.luckit.user.domain.UserRepository;
 import jakarta.transaction.Transactional;
 import java.security.Principal;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,6 +43,7 @@ public class FortuneService {
     private final TranslationService translationService;
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
+    private final FortuneRepository fortuneRepository;
     private final GoalService goalService;
 
     @Value("${openai.api.url}")
@@ -51,6 +59,7 @@ public class FortuneService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
                         ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
+        String userName = user.getName();
         String emotionPrompt = generateFriendlyGoalRecommendationPrompt();
         String translatedPromptToEn = translationService.translate(emotionPrompt, "EN");
 
@@ -108,10 +117,29 @@ public class FortuneService {
 
     @Transactional
     public ApiResponseTemplate<UserFortuneResponseDto> createDailyFortune(Principal principal) {
+
         Integer userId = Integer.parseInt(principal.getName());
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
                         ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
+
+        LocalDate today = LocalDate.now();
+        if (fortuneRepository.existsByUserAndDate(user, today)) {
+
+            Fortune fortune = fortuneRepository.findByUserAndDate(user, today)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NO_FORTUNE_ERROR, ErrorCode.NO_FORTUNE_ERROR.getMessage()));
+
+            UserFortuneResponseDto userFortuneResponseDto =  UserFortuneResponseDto.builder()
+                    .fortuneKeywords(fortune.getFortuneKeywords())
+                    .shortFortune(fortune.getShortFortune())
+                    .fullFortune(fortune.getFullFortune())
+                    .categoryFortuneScores(fortune.getCategoryFortuneScores())
+                    .timeOfDayFortuneScores(fortune.getTimeOfDayFortuneScores())
+                    .overallFortuneScore(fortune.getOverallFortuneScore())
+                    .build();
+
+            return ApiResponseTemplate.success(SuccessCode.GET_FORTUNE_SUCCESS,userFortuneResponseDto);
+        }
 
         String prompt = generateFortunePrompt(user);
         String translatedPrompt = translationService.translate(prompt, "EN");
@@ -144,6 +172,18 @@ public class FortuneService {
                 fortuneResponse.categoryFortuneScores(),
                 fortuneResponse.timeOfDayFortuneScores()
         );
+
+        Fortune fortune = Fortune.builder()
+                .user(user)
+                .fortuneKeywords(translatedFortuneResponse.fortuneKeywords())
+                .categoryFortuneScores(translatedFortuneResponse.categoryFortuneScores())
+                .timeOfDayFortuneScores(translatedFortuneResponse.timeOfDayFortuneScores())
+                .overallFortuneScore(translatedFortuneResponse.overallFortuneScore())
+                .shortFortune(translatedFortuneResponse.shortFortune())
+                .fullFortune(translatedFortuneResponse.fullFortune())
+                .build();
+
+        fortuneRepository.save(fortune);
 
         return ApiResponseTemplate.success(SuccessCode.GET_USER_FORTUNE_SUCCESS, translatedFortuneResponse);
     }
