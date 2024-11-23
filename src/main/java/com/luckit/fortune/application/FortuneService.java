@@ -58,7 +58,6 @@ public class FortuneService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
                         ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
-        String userName = user.getName();
         String emotionPrompt = generateFriendlyGoalRecommendationPrompt();
         String translatedPromptToEn = translationService.translate(emotionPrompt, "EN");
 
@@ -89,29 +88,25 @@ public class FortuneService {
     }
 
     private String generateFriendlyGoalRecommendationPrompt() {
-        return String.format(
-                "You are a service that recommends goals to users who are thinking about which goals to achieve. "
-                        + "Provide at least three goals that the user can achieve, along with the recommended duration for each goal. "
-                        + "The format should be strictly as follows: "
-                        + "'1. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', "
-                        + "'2. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', and so on."
-                        + "For example: "
-                        + "'1. **Goals:** Start a daily meditation practice. **Period:** 30 days', "
-                        + "'2. **Goals:** Read a book. **Period:** 20 days', "
-                        + "'3. **Goals:** Stretch for 15 minutes every day. **Period:** 30 days'. "
-                        + "Make sure each goal and period is in the given format without any additional details or variations."
-        );
+        return "You are a service that recommends goals to users who are thinking about which goals to achieve. "
+                + "Provide at least three goals that the user can achieve, along with the recommended duration for each goal. "
+                + "The format should be strictly as follows: "
+                + "'1. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', "
+                + "'2. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', and so on."
+                + "For example: "
+                + "'1. **Goals:** Start a daily meditation practice. **Period:** 30 days', "
+                + "'2. **Goals:** Read a book. **Period:** 20 days', "
+                + "'3. **Goals:** Stretch for 15 minutes every day. **Period:** 30 days'. "
+                + "Make sure each goal and period is in the given format without any additional details or variations.";
     }
 
     private List<GoalPeriod> extractGoalsAndPeriods(String response) {
         Pattern pattern = Pattern.compile("\\*\\*(목표|Goals):\\*\\*\\s*(.*?)\\s*\\*\\*(기간|Period):\\*\\*\\s*(\\d+일|\\d+ days)");
         Matcher matcher = pattern.matcher(response);
 
-        List<GoalPeriod> goalPeriodList = matcher.results()
+        return matcher.results()
                 .map(matchResult -> new GoalPeriod(matchResult.group(2).trim(), matchResult.group(4).trim()))
                 .collect(Collectors.toList());
-
-        return goalPeriodList;
     }
 
     @Transactional
@@ -218,7 +213,7 @@ public class FortuneService {
     }
 
     private List<String> extractKeywords(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(키워드|Keywords)\\*\\*:)[\\s]*([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(키워드|Keywords)\\*\\*:)\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             return Arrays.asList(matcher.group(2).split(",\\s*"));
@@ -227,7 +222,7 @@ public class FortuneService {
     }
 
     private String extractShortFortune(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(짧은 행운의 메시지|짧은 운세 메시지|Short Fortune Message)\\*\\*[:：]?\\s*)([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("\\*\\*(짧은 행운의 메시지|짧은 운세 메시지|Short Fortune Message)\\*\\*[:：]?\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(2).trim();
@@ -236,7 +231,7 @@ public class FortuneService {
     }
 
     private String extractFullFortune(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(상세 운세 메시지|자세한 운세 메시지|Detailed Fortune Message)\\*\\*[:：]?\\s*)([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("\\*\\*(상세 운세 메시지|자세한 운세 메시지|Detailed Fortune Message)\\*\\*[:：]?\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(2).trim();
@@ -245,7 +240,7 @@ public class FortuneService {
     }
 
     private Map<String, Integer> extractCategoryFortuneScores(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(점수|Scores)\\*\\*[:：]?\\s*)(-\\s*[가-힣A-Za-z]+[:：]?\\s*\\d+\\s*)+");
+        Pattern pattern = Pattern.compile("\\*\\*(점수|Scores)\\*\\*[:：]?\\s*((-\\s*[가-힣A-Za-z]+[:：]?\\s*\\d+\\s*)+)");
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             String scoresSection = matcher.group();
@@ -265,7 +260,7 @@ public class FortuneService {
     }
 
     private Map<String, Integer> extractTimeOfDayFortuneScores(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(전체 점수|Overall Scores)\\*\\*:)[\\s]*([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(전체 점수|Overall Scores)\\*\\*:)\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             String[] scores = matcher.group(2).split(",\\s*");
@@ -339,7 +334,6 @@ public class FortuneService {
         List<UserMissionResDto> missionList = new ArrayList<>();
 
         for (String line : lines) {
-
             String[] parts = line.split(" - ");
             if (parts.length == 2) {
                 String missionName = parts[0].trim();
@@ -352,6 +346,7 @@ public class FortuneService {
                     logger.info("Added Mission: {}", mission);
                 } catch (IllegalArgumentException e) {
                     logger.warn("Invalid FortuneType received: {}", fortuneTypeStr);
+
                 }
             } else {
                 logger.warn("Unexpected format in line: {}", line);
