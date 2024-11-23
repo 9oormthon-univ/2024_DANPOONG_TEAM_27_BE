@@ -1,10 +1,9 @@
-package com.luckit.fortune.api.application;
+package com.luckit.fortune.application;
 
 import com.luckit.fortune.api.dto.request.FortuneReqDto;
 import com.luckit.fortune.api.dto.response.FortuneResDto;
 import com.luckit.fortune.api.dto.response.GoalPeriod;
 import com.luckit.fortune.api.dto.response.UserFortuneResponseDto;
-import com.luckit.fortune.domain.Message;
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.global.exception.code.SuccessCode;
@@ -52,7 +51,6 @@ public class FortuneService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
                         ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
-        String userName = user.getName();
         String emotionPrompt = generateFriendlyGoalRecommendationPrompt();
         String translatedPromptToEn = translationService.translate(emotionPrompt, "EN");
 
@@ -78,7 +76,6 @@ public class FortuneService {
             logger.warn("No goals were extracted from the GPT response.");
             throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "No goals were extracted from the GPT response.");
         }
-
 
         return ApiResponseTemplate.success(SuccessCode.ADD_GOAL_SUCCESS, goalPeriodList);
     }
@@ -119,7 +116,7 @@ public class FortuneService {
         String prompt = generateFortunePrompt(user);
         String translatedPrompt = translationService.translate(prompt, "EN");
 
-        FortuneReqDto reqDto = new FortuneReqDto(model, Collections.singletonList(new Message("user", translatedPrompt)));
+        FortuneReqDto reqDto = new FortuneReqDto(model, Collections.singletonList(new com.luckit.fortune.domain.Message("user", translatedPrompt)));
         FortuneResDto resDto = restTemplate.postForObject(apiURL, reqDto, FortuneResDto.class);
 
         if (resDto == null || resDto.choices().isEmpty()) {
@@ -150,7 +147,6 @@ public class FortuneService {
 
         return ApiResponseTemplate.success(SuccessCode.GET_USER_FORTUNE_SUCCESS, translatedFortuneResponse);
     }
-
 
     private String generateFortunePrompt(User user) {
         return String.format(
@@ -191,8 +187,6 @@ public class FortuneService {
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract keywords from response.");
     }
 
-
-
     private String extractShortFortune(String response) {
         Pattern pattern = Pattern.compile("(?<=\\*\\*(짧은 행운의 메시지|짧은 운세 메시지|Short Fortune Message)\\*\\*[:：]?\\s*)([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
@@ -202,12 +196,6 @@ public class FortuneService {
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract short fortune from response.");
     }
 
-
-
-
-
-
-
     private String extractFullFortune(String response) {
         Pattern pattern = Pattern.compile("(?<=\\*\\*(상세 운세 메시지|자세한 운세 메시지|Detailed Fortune Message)\\*\\*[:：]?\\s*)([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
@@ -216,9 +204,6 @@ public class FortuneService {
         }
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract full fortune from response.");
     }
-
-
-
 
     private Map<String, Integer> extractCategoryFortuneScores(String response) {
         Pattern pattern = Pattern.compile("(?<=\\*\\*(점수|Scores)\\*\\*[:：]?\\s*)(-\\s*[가-힣A-Za-z]+[:：]?\\s*\\d+\\s*)+");
@@ -240,38 +225,22 @@ public class FortuneService {
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract category scores from response.");
     }
 
-
-
     private Map<String, Integer> extractTimeOfDayFortuneScores(String response) {
-        Pattern pattern = Pattern.compile("\\*\\*(전체 점수|Overall Scores)\\*\\*[:：]?\\s*((-\\s*[가-힣A-Za-z]+[:：]?\\s*\\d+\\s*)+)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(전체 점수|Overall Scores)\\*\\*:)[\\s]*([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
-            String scoresSection = matcher.group(2).trim();
-            String[] scores = scoresSection.split("-\\s*");
+            String[] scores = matcher.group(2).split(",\\s*");
             Map<String, Integer> scoreMap = new HashMap<>();
             for (String score : scores) {
-                if (!score.isBlank()) {
-                    String[] parts = score.split("[:：]\\s*");
-                    if (parts.length == 2) {
-                        String key = parts[0].trim();
-                        Integer value = Integer.parseInt(parts[1].trim());
-                        scoreMap.put(key, value);
-                    }
+                String[] parts = score.split(":\\s*");
+                if (parts.length == 2) {
+                    String key = parts[0].trim().replaceFirst("^-\\s*", "");
+                    Integer value = Integer.parseInt(parts[1].trim());
+                    scoreMap.put(key, value);
                 }
             }
             return scoreMap;
         }
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract time of day scores from response.");
     }
-
-
-
-
-
-
-
 }
-
-
-
-
