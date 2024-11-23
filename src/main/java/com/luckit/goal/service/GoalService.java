@@ -2,10 +2,7 @@ package com.luckit.goal.service;
 
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
-import com.luckit.goal.controller.dto.AddGoalDto;
-import com.luckit.goal.controller.dto.CompleteGoalDto;
-import com.luckit.goal.controller.dto.GetGoalDto;
-import com.luckit.goal.controller.dto.GetGoalMypageDto;
+import com.luckit.goal.controller.dto.*;
 import com.luckit.goal.domain.Goal;
 import com.luckit.goal.domain.GoalRepository;
 import com.luckit.todo.domain.Todo;
@@ -114,7 +111,10 @@ public class GoalService {
     }
 
 
-    public List<Integer> getEachGoalMypage(Integer goalId) {
+    public GetEachGoalMypageDto getEachGoalMypage(Integer goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
 
         List<Todo> completeTodoList = todoRepository.findCompletedTodosByGoalId(goalId);
 
@@ -129,7 +129,18 @@ public class GoalService {
             countAnimals.set(index, countAnimals.get(index) + 1);
         }
 
-        return countAnimals;
+        LocalDate start_date = goal.getStartDate();
+        LocalDate end_date = goal.getEndDate();
+
+        return GetEachGoalMypageDto.builder()
+                .start_date_year(start_date.getYear())
+                .start_date_month(start_date.getMonthValue())
+                .start_date_day(start_date.getDayOfMonth())
+                .end_date_year(end_date.getYear())
+                .end_date_month(end_date.getMonthValue())
+                .end_date_day(end_date.getDayOfMonth())
+                .countAnimals(countAnimals)
+                .build();
     }
 
     public CompleteGoalDto completeGoal(Integer goalId) {

@@ -2,10 +2,7 @@ package com.luckit.goal.controller;
 
 import com.luckit.global.exception.code.SuccessCode;
 import com.luckit.global.template.ApiResponseTemplate;
-import com.luckit.goal.controller.dto.AddGoalDto;
-import com.luckit.goal.controller.dto.CompleteGoalDto;
-import com.luckit.goal.controller.dto.GetGoalDto;
-import com.luckit.goal.controller.dto.GetGoalMypageDto;
+import com.luckit.goal.controller.dto.*;
 import com.luckit.goal.service.GoalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
@@ -44,7 +41,7 @@ public class GoalController implements GoalControllerDocs {
     }
 
     @GetMapping("/mypage/{goal_id}")
-    public ApiResponseTemplate<List<Integer>> getEachGoalMypage(
+    public ApiResponseTemplate<GetEachGoalMypageDto> getEachGoalMypage(
             @PathVariable("goal_id") Integer goalId
     ) {
         return ApiResponseTemplate.success(SuccessCode.GET_EACH_GOAL_MYPAGE_SUCCESS, goalService.getEachGoalMypage(goalId));

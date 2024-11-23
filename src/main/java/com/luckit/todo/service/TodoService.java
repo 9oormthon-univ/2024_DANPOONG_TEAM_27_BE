@@ -1,5 +1,7 @@
 package com.luckit.todo.service;
 
+import com.luckit.fortune.api.dto.response.UserMissionResDto;
+import com.luckit.fortune.application.FortuneService;
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.goal.domain.Goal;
@@ -11,6 +13,7 @@ import com.luckit.todo.domain.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,7 @@ public class TodoService {
 
     private final GoalRepository goalRepository;
     private final TodoRepository todoRepository;
+    private final FortuneService fortuneService;
 
     public String addTodo(AddTodoDto addTodoDto) {
 
@@ -31,12 +35,21 @@ public class TodoService {
 
         Random random = new Random();
         int randomAnimal = random.nextInt(12) + 1;
+        int score = random.nextInt(5) + 1;
+
+        UserMissionResDto.FortuneType[] values = UserMissionResDto.FortuneType.values();
+        int randomIndex = random.nextInt(values.length);
+        UserMissionResDto.FortuneType fortuneType = values[randomIndex];
+
 
         Todo todo = Todo.builder()
                 .goal(goal)
                 .name(addTodoDto.name())
-                .idCompleted(false)
+                .isCompleted(false)
+                .isMadeByGpt(false)
                 .animal(randomAnimal)
+                .fortuneType(String.valueOf(fortuneType))
+                .score(score)
                 .build();
 
         todoRepository.save(todo);
@@ -44,7 +57,43 @@ public class TodoService {
         return "Todo successfully saved.";
     }
 
-    public List<GetTodoDto> getTodo(Integer goalId) {
+    // 무작위로 FortuneType을 선택하는 메서드
+    private UserMissionResDto.FortuneType getRandomFortuneType(Random random) {
+        UserMissionResDto.FortuneType[] types = UserMissionResDto.FortuneType.values(); // 모든 FortuneType 가져오기
+        return types[random.nextInt(types.length)]; // 무작위로 하나 선택
+    }
+
+    public List<GetTodoDto> getTodo(Principal principal, Integer goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
+
+        if (!todoRepository.existsByGoal_IdAndIsMadeByGptTrueAndDate(goalId, LocalDate.now())) {
+            Random random = new Random(); // Random 객체 생성
+
+            List<UserMissionResDto> missionResDtos = fortuneService.createDailyMission(principal, goalId);
+            for (UserMissionResDto missionResDto : missionResDtos) {
+
+                int randomAnimal = random.nextInt(12) + 1;
+                int score = random.nextInt(5) + 1;
+
+                UserMissionResDto.FortuneType[] values = UserMissionResDto.FortuneType.values();
+                int randomIndex = random.nextInt(values.length);
+                UserMissionResDto.FortuneType fortuneType = values[randomIndex];
+
+                Todo todo = Todo.builder()
+                        .goal(goal)
+                        .name(missionResDto.missionName())
+                        .isCompleted(false)
+                        .isMadeByGpt(true)
+                        .fortuneType(fortuneType.name())
+                        .animal(randomAnimal)
+                        .score(score)
+                        .build();
+
+                todoRepository.save(todo);
+            }
+        }
 
         List<Todo> todoList = todoRepository.findAllByGoalId(goalId);
 
@@ -60,7 +109,10 @@ public class TodoService {
                     .month(date.getMonthValue())
                     .day(date.getDayOfMonth())
                     .name(todo.getName())
-                    .isCompleted(todo.isIdCompleted())
+                    .isCompleted(todo.isCompleted())
+                    .isMadeByGpt(todo.isMadeByGpt())
+                    .score(todo.getScore())
+                    .fortuneType(UserMissionResDto.FortuneType.valueOf(todo.getFortuneType()))
                     .animal(todo.getAnimal())
                     .build();
 
