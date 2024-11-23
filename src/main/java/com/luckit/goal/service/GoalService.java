@@ -90,7 +90,7 @@ public class GoalService {
 
     public List<GetGoalMypageDto> getGoalMypage(Integer userId) {
 
-        List<Goal> goalList = goalRepository.findAllByUser_UserId(userId);
+        List<Goal> goalList = goalRepository.findCompletedGoalsByUserId(userId);
 
         List<GetGoalMypageDto> getGoalMypageDtos = new ArrayList<>();
 

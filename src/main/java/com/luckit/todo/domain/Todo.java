@@ -32,7 +32,7 @@ public class Todo {
     @CreatedDate
     private LocalDate date;
 
-    @Column(name = "id_completed", nullable = false)
+    @Column(name = "is_completed", nullable = false)
     @Builder.Default
     private boolean isCompleted = false;
 
