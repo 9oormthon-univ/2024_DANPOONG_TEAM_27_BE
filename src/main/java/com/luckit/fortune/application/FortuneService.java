@@ -4,6 +4,7 @@ import com.luckit.fortune.api.dto.request.FortuneReqDto;
 import com.luckit.fortune.api.dto.response.FortuneResDto;
 import com.luckit.fortune.api.dto.response.GoalPeriod;
 import com.luckit.fortune.api.dto.response.UserFortuneResponseDto;
+import com.luckit.fortune.domain.Message;
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.global.exception.code.SuccessCode;
@@ -54,7 +55,7 @@ public class FortuneService {
         String emotionPrompt = generateFriendlyGoalRecommendationPrompt();
         String translatedPromptToEn = translationService.translate(emotionPrompt, "EN");
 
-        FortuneReqDto reqDto = new FortuneReqDto(model, Collections.singletonList(new com.luckit.fortune.domain.Message("user", translatedPromptToEn)));
+        FortuneReqDto reqDto = new FortuneReqDto(model, Collections.singletonList(new Message("user", translatedPromptToEn)));
         FortuneResDto resDto = restTemplate.postForObject(apiURL, reqDto, FortuneResDto.class);
 
         if (resDto == null || resDto.choices().isEmpty()) {
