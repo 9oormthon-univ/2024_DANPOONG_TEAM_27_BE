@@ -22,7 +22,7 @@ public enum ErrorCode {
 
     NO_GOAL_ERROR(HttpStatus.BAD_REQUEST, "해당 목표가 존재하지 않습니다."),
     NO_TODO_ERROR(HttpStatus.BAD_REQUEST, "해당 미션이 존재하지 않습니다."),
-    UNDEFINED_ERROR(HttpStatus.BAD_REQUEST, "정의되지 않은 오류가 발생했습니다."),
+
 
 
     // 401 Unauthorized
@@ -44,6 +44,7 @@ public enum ErrorCode {
     // 500 Internal Server Exception
     INTERNAL_SERVER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 오류가 발생했습니다."),
     TOKEN_CREATION_FAILED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "토큰 생성 중 오류가 발생했습니다."),
+    UNDEFINED_ERROR(HttpStatus.BAD_REQUEST, "정의되지 않은 오류가 발생했습니다."),
 
     // 503 Service Unavailable
     FAILED_GET_TOKEN_EXCEPTION(HttpStatus.SERVICE_UNAVAILABLE, "토큰을 가져오는 중 오류가 발생했습니다."),
