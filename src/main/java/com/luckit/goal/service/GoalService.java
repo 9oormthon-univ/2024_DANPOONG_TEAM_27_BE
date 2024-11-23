@@ -113,6 +113,25 @@ public class GoalService {
 
     }
 
+
+    public List<Integer> getEachGoalMypage(Integer goalId) {
+
+        List<Todo> completeTodoList = todoRepository.findCompletedTodosByGoalId(goalId);
+
+        List<Integer> countAnimals = new ArrayList<>();
+
+        for (int i = 0; i < 12; i++) {
+            countAnimals.add(0);
+        }
+
+        for (Todo todo : completeTodoList) {
+            int index = todo.getAnimal() - 1;
+            countAnimals.set(index, countAnimals.get(index) + 1);
+        }
+
+        return countAnimals;
+    }
+
     public CompleteGoalDto completeGoal(Integer goalId) {
 
         Goal goal = goalRepository.findById(goalId)

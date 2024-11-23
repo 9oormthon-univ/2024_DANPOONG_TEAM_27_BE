@@ -86,6 +86,27 @@ public interface GoalControllerDocs {
     );
 
     @Operation(
+            summary = "목표 개별 조회 (마이페이지)",
+            description = "목표 개별 조회 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully retrieved goal information.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema( // 배열 타입 명시
+                                            schema = @Schema(implementation = Integer.class)
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<List<Integer>> getEachGoalMypage(
+            @PathVariable("goal_id") Integer goalId
+    );
+
+    @Operation(
             summary = "목표 완료 상태 변경",
             description = "목표 상태 변경 API",
             responses = {
