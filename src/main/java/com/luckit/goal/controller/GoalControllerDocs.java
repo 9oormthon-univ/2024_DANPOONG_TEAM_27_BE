@@ -4,6 +4,7 @@ package com.luckit.goal.controller;
 import com.luckit.global.dto.UserInfo;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.goal.controller.dto.AddGoalDto;
+import com.luckit.goal.controller.dto.CompleteGoalDto;
 import com.luckit.goal.controller.dto.GetGoalDto;
 import com.luckit.goal.controller.dto.GetGoalMypageDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,13 +94,13 @@ public interface GoalControllerDocs {
                             description = "Successfully change goal status.",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = CompleteGoalDto.class)
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access")
             }
     )
-    ApiResponseTemplate<String> completeGoal(
+    ApiResponseTemplate<CompleteGoalDto> completeGoal(
             @PathVariable("goal_id") Integer goalId
     );
 
