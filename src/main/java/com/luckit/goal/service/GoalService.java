@@ -5,6 +5,7 @@ import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.goal.controller.dto.*;
 import com.luckit.goal.domain.Goal;
 import com.luckit.goal.domain.GoalRepository;
+import com.luckit.todo.controller.dto.UpdateTodoDto;
 import com.luckit.todo.domain.Todo;
 import com.luckit.todo.domain.TodoRepository;
 import com.luckit.user.domain.User;
@@ -202,4 +203,15 @@ public class GoalService {
         return "Goal successfully deleted.";
     }
 
+    public String updateGoal(UpdateTodoDto updateTodoDto) {
+
+        Goal goal = goalRepository.findById(updateTodoDto.todoId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
+
+        goal.updateName(updateTodoDto.name());
+
+        goalRepository.save(goal);
+
+        return "Goal successfully updated.";
+    }
 }

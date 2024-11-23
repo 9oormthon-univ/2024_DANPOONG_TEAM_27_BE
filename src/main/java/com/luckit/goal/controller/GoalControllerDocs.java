@@ -4,6 +4,7 @@ package com.luckit.goal.controller;
 import com.luckit.global.dto.UserInfo;
 import com.luckit.global.template.ApiResponseTemplate;
 import com.luckit.goal.controller.dto.*;
+import com.luckit.todo.controller.dto.UpdateTodoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -137,5 +138,24 @@ public interface GoalControllerDocs {
     )
     ApiResponseTemplate<String> deleteGoal(
             @PathVariable("goal_id") Integer goalId
+    );
+
+    @Operation(
+            summary = "목표 수정",
+            description = "목표 수정 API",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successfully update goal.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = String.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access")
+            }
+    )
+    ApiResponseTemplate<String> updateGoal(
+            @RequestBody UpdateTodoDto updateTodoDto
     );
 }

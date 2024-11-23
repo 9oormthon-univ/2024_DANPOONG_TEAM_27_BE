@@ -22,6 +22,7 @@ public enum ErrorCode {
     NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임입니다."),
 
     NO_GOAL_ERROR(HttpStatus.BAD_REQUEST, "해당 목표가 존재하지 않습니다."),
+    EMPTY_NEW_GOAL_ERROR(HttpStatus.BAD_REQUEST, "수정하려는 목표 이름이 비어있습니다."),
 
     NO_TODO_ERROR(HttpStatus.BAD_REQUEST, "해당 미션이 존재하지 않습니다."),
     EMPTY_NEW_TODO_ERROR(HttpStatus.BAD_REQUEST, "수정하려는 미션 이름이 비어있습니다."),

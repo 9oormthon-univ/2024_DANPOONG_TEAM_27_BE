@@ -1,5 +1,7 @@
 package com.luckit.goal.domain;
 
+import com.luckit.global.exception.CustomException;
+import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,4 +35,11 @@ public class Goal {
         this.isCompleted = !this.isCompleted;
     }
 
+    // Name 수정 메서드
+    public void updateName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.EMPTY_NEW_GOAL_ERROR, ErrorCode.EMPTY_NEW_GOAL_ERROR.getMessage());
+        }
+        this.name = name.trim();
+    }
 }
