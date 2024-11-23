@@ -56,6 +56,7 @@ public interface TodoControllerDocs {
             }
     )
     ApiResponseTemplate<List<GetTodoDto>> getTodo(
+            Principal principal,
             @PathVariable("goal_id") Integer goal_id
     );
 
