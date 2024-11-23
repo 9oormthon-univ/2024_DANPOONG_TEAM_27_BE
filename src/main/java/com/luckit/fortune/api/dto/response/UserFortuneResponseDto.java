@@ -1,8 +1,11 @@
 package com.luckit.fortune.api.dto.response;
 
+import lombok.Builder;
+
 import java.util.List;
 import java.util.Map;
 
+@Builder
 public record UserFortuneResponseDto(
         List<String> fortuneKeywords,
         String shortFortune,

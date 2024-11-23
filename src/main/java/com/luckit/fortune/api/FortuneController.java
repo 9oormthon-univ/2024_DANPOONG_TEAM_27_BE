@@ -41,8 +41,8 @@ public class FortuneController {
 
     @GetMapping("/daily")
     @Operation(
-            summary = "유저의 일일 운세를 생성",
-            description = "특정 유저의 일일 운세를 생성합니다.",
+            summary = "유저의 일일 운세를 생성, 이미 있다면 조회",
+            description = "특정 유저의 일일 운세를 생성하거나 조회합니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "운세 생성을 성공했습니다.")
             }
