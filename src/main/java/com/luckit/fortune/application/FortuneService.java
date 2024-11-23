@@ -313,12 +313,12 @@ public class FortuneService {
 
     private String generateMissionPrompt(User user) {
         return String.format(
-                "You need to provide a mission to increase your property based on your target '%s'. Please keep your response format strict as follows.\n" +
-                        "Include the following information:\n" +
-                        "1. **Mission name**: The name of the mission.\n" +
-                        "2. **That type**: Please use one of the following types: LOVE, MONEY, CAREER, STUDY, HEALTH.\n" +
-                        "   Provide the type followed by a score (e.g., LOVE 10 points). Each mission should only have one type with one score.\n" +
-                        "Provide one or more missions in the exact format without any additional details.",
+                "You must provide a mission to increase your property based on your target '%s'. Please keep your response format strict as follows.\n" +
+                        "Includes the following information:\n" +
+                        "1. **Mission name**: Name of the mission.\n" +
+                        "2. **That type**: Please use one of the following types: LOVE, MONEY, CARE, Study, Health.\n" +
+                        "   Type the type that follows the score (for example, LOVE 10 points). Each mission must have only one type with one score.\n" +
+                        "We provide 3 missions in an accurate format with no additional details.",
                 goalService.getGoal(user.getUserId())
         );
     }
@@ -336,10 +336,13 @@ public class FortuneService {
         typeTranslationMap.put("커리어", UserMissionResDto.FortuneType.CAREER);
         typeTranslationMap.put("경력", UserMissionResDto.FortuneType.CAREER);
         typeTranslationMap.put("공부", UserMissionResDto.FortuneType.STUDY);
+        typeTranslationMap.put("돈", UserMissionResDto.FortuneType.MONEY);
         typeTranslationMap.put("LOVE", UserMissionResDto.FortuneType.LOVE);
         typeTranslationMap.put("HEALTH", UserMissionResDto.FortuneType.HEALTH);
         typeTranslationMap.put("CAREER", UserMissionResDto.FortuneType.CAREER);
         typeTranslationMap.put("STUDY", UserMissionResDto.FortuneType.STUDY);
+        typeTranslationMap.put("CARE", UserMissionResDto.FortuneType.HEALTH);
+
 
         for (String line : lines) {
             line = line.trim();
@@ -370,22 +373,22 @@ public class FortuneService {
                             try {
                                 UserMissionResDto.FortuneType fortuneType = UserMissionResDto.FortuneType.valueOf(fortuneTypeStr);
                                 scores.put(fortuneType, fortunePoints);
-                                logger.info("Extracted Type: {}, Points: {}", fortuneType, fortunePoints);
+                                logger.info("유형: {}, 점수: {}", fortuneType, fortunePoints);
                             } catch (IllegalArgumentException e) {
                                 throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Invalid fortune type in response: " + fortuneTypeStr);
                             }
                         } else {
-                            logger.warn("Points value is empty or invalid for line: {}", line);
+                            logger.warn("점수 값이 비어있거나 잘못되었습니다 : {}", line);
                         }
                     } else {
-                        logger.warn("Type and points format is unexpected for line: {}", line);
+                        logger.warn("점수와 값의 형식이 예기치 않습니다 : {}", line);
                     }
                 }
 
                 if (missionName != null && !scores.isEmpty()) {
                     UserMissionResDto mission = new UserMissionResDto(missionName, scores);
                     missionList.add(mission);
-                    logger.info("Added Mission: {}", mission);
+                    logger.info("추가된 미션: {}", mission);
 
                     missionName = null;
                     scores = new HashMap<>();
@@ -394,7 +397,7 @@ public class FortuneService {
         }
 
         if (missionList.isEmpty()) {
-            throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract mission from response.");
+            throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "응답을 변환하는데 실패했습니다.");
         }
 
         return missionList;
