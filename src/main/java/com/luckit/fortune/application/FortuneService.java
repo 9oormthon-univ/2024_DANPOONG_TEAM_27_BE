@@ -12,8 +12,6 @@ import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.global.exception.code.SuccessCode;
 import com.luckit.global.template.ApiResponseTemplate;
-import com.luckit.goal.domain.Goal;
-import com.luckit.goal.domain.GoalRepository;
 import com.luckit.goal.service.GoalService;
 import com.luckit.user.domain.User;
 import com.luckit.user.domain.UserRepository;
@@ -43,7 +41,6 @@ public class FortuneService {
     private final UserRepository userRepository;
     private final FortuneRepository fortuneRepository;
     private final GoalService goalService;
-    private final GoalRepository goalRepository;
 
     @Value("${openai.api.url}")
     private String apiURL;
@@ -58,6 +55,7 @@ public class FortuneService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
                         ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
+        String userName = user.getName();
         String emotionPrompt = generateFriendlyGoalRecommendationPrompt();
         String translatedPromptToEn = translationService.translate(emotionPrompt, "EN");
 
@@ -88,25 +86,29 @@ public class FortuneService {
     }
 
     private String generateFriendlyGoalRecommendationPrompt() {
-        return "You are a service that recommends goals to users who are thinking about which goals to achieve. "
-                + "Provide at least three goals that the user can achieve, along with the recommended duration for each goal. "
-                + "The format should be strictly as follows: "
-                + "'1. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', "
-                + "'2. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', and so on."
-                + "For example: "
-                + "'1. **Goals:** Start a daily meditation practice. **Period:** 30 days', "
-                + "'2. **Goals:** Read a book. **Period:** 20 days', "
-                + "'3. **Goals:** Stretch for 15 minutes every day. **Period:** 30 days'. "
-                + "Make sure each goal and period is in the given format without any additional details or variations.";
+        return String.format(
+                "You are a service that recommends goals to users who are thinking about which goals to achieve. "
+                        + "Provide at least three goals that the user can achieve, along with the recommended duration for each goal. "
+                        + "The format should be strictly as follows: "
+                        + "'1. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', "
+                        + "'2. **Goals:** [Explanation of the goal] **Period:** [Duration in days]', and so on."
+                        + "For example: "
+                        + "'1. **Goals:** Start a daily meditation practice. **Period:** 30 days', "
+                        + "'2. **Goals:** Read a book. **Period:** 20 days', "
+                        + "'3. **Goals:** Stretch for 15 minutes every day. **Period:** 30 days'. "
+                        + "Make sure each goal and period is in the given format without any additional details or variations."
+        );
     }
 
     private List<GoalPeriod> extractGoalsAndPeriods(String response) {
         Pattern pattern = Pattern.compile("\\*\\*(목표|Goals):\\*\\*\\s*(.*?)\\s*\\*\\*(기간|Period):\\*\\*\\s*(\\d+일|\\d+ days)");
         Matcher matcher = pattern.matcher(response);
 
-        return matcher.results()
+        List<GoalPeriod> goalPeriodList = matcher.results()
                 .map(matchResult -> new GoalPeriod(matchResult.group(2).trim(), matchResult.group(4).trim()))
                 .collect(Collectors.toList());
+
+        return goalPeriodList;
     }
 
     @Transactional
@@ -213,7 +215,7 @@ public class FortuneService {
     }
 
     private List<String> extractKeywords(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(키워드|Keywords)\\*\\*:)\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(키워드|Keywords)\\*\\*:)[\\s]*([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             return Arrays.asList(matcher.group(2).split(",\\s*"));
@@ -222,7 +224,7 @@ public class FortuneService {
     }
 
     private String extractShortFortune(String response) {
-        Pattern pattern = Pattern.compile("\\*\\*(짧은 행운의 메시지|짧은 운세 메시지|Short Fortune Message)\\*\\*[:：]?\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(짧은 행운의 메시지|짧은 운세 메시지|Short Fortune Message)\\*\\*[:：]?\\s*)([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(2).trim();
@@ -231,7 +233,7 @@ public class FortuneService {
     }
 
     private String extractFullFortune(String response) {
-        Pattern pattern = Pattern.compile("\\*\\*(상세 운세 메시지|자세한 운세 메시지|Detailed Fortune Message)\\*\\*[:：]?\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(상세 운세 메시지|자세한 운세 메시지|Detailed Fortune Message)\\*\\*[:：]?\\s*)([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(2).trim();
@@ -240,7 +242,7 @@ public class FortuneService {
     }
 
     private Map<String, Integer> extractCategoryFortuneScores(String response) {
-        Pattern pattern = Pattern.compile("\\*\\*(점수|Scores)\\*\\*[:：]?\\s*((-\\s*[가-힣A-Za-z]+[:：]?\\s*\\d+\\s*)+)");
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(점수|Scores)\\*\\*[:：]?\\s*)(-\\s*[가-힣A-Za-z]+[:：]?\\s*\\d+\\s*)+");
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             String scoresSection = matcher.group();
@@ -260,7 +262,7 @@ public class FortuneService {
     }
 
     private Map<String, Integer> extractTimeOfDayFortuneScores(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(전체 점수|Overall Scores)\\*\\*:)\\s*([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(?<=\\*\\*(전체 점수|Overall Scores)\\*\\*:)[\\s]*([^\\n]*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
             String[] scores = matcher.group(2).split(",\\s*");
@@ -278,54 +280,46 @@ public class FortuneService {
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract time of day scores from response.");
     }
 
-
     @Transactional
-    public List<UserMissionResDto> createDailyMission(Principal principal, Integer goalId) {
-        // 1. 사용자 ID로 User 객체 가져오기
+    public ApiResponseTemplate<List<UserMissionResDto>> createDailyMission(Principal principal) {
         Integer userId = Integer.parseInt(principal.getName());
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
                         ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
-        // 2. Goal 객체 가져오기
-        Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_GOAL_ERROR, ErrorCode.NO_GOAL_ERROR.getMessage()));
+        String prompt = generateMissionPrompt(user);
+        String translatedPrompt = translationService.translate(prompt, "EN");
 
-        // 3. Goal 이름을 영어로 번역
-        String goalNameInEnglish = translationService.translate(goal.getName(), "EN");
-        logger.info("Goal name translated to English: {}", goalNameInEnglish);
-
-        // 4. GPT 요청 생성
-        String prompt = generateMissionPrompt(goalNameInEnglish);
-        FortuneReqDto reqDto = new FortuneReqDto(model, List.of(new com.luckit.fortune.domain.Message("user", prompt)));
+        FortuneReqDto reqDto = new FortuneReqDto(model, List.of(new com.luckit.fortune.domain.Message("user", translatedPrompt)));
         FortuneResDto resDto = restTemplate.postForObject(apiURL, reqDto, FortuneResDto.class);
 
-        // 5. GPT 응답 검증
         if (resDto == null || resDto.choices().isEmpty()) {
             throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION,
                     ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION.getMessage());
         }
 
-        // 6. GPT 응답 처리
         FortuneResDto.Choice choice = resDto.choices().get(0);
-        String responseInEnglish = choice.message().content();
-        logger.info("GPT Response: {}", responseInEnglish);
+        String responseInEN = choice.message().content();
 
-        // 7. 응답 파싱 및 미션 생성
-        return parseMissionResponse(responseInEnglish);
+        logger.info("GPT Response in English: {}", responseInEN);
+
+        String translatedResponseToKO = translationService.translate(responseInEN, "KO");
+        logger.info("Translated Response in Korean: {}", translatedResponseToKO);
+
+        List<UserMissionResDto> missionResDto = parseMissionResponse(translatedResponseToKO);
+
+        return ApiResponseTemplate.success(SuccessCode.GET_USER_MISSION_SUCCESS, missionResDto);
     }
 
-    private String generateMissionPrompt(String goalName) {
+    private String generateMissionPrompt(User user) {
         return String.format(
-                "Generate 3 highly specific and actionable missions related to the goal '%s'. Each mission must be practical and detailed, with clear steps or outcomes. " +
-                        "Assign each mission a relevant FortuneType from the following: LOVE, MONEY, CAREER, STUDY, HEALTH. " +
-                        "Return the result in the following format (one mission per line):\n" +
-                        "MissionName - FortuneType\n" +
-                        "For example:\n" +
-                        "'Strengthen personal relationships through shared hobbies - LOVE'\n" +
-                        "'Build a detailed monthly budget for expenses and savings - MONEY'\n" +
-                        "'Complete an online course in data analysis - STUDY'\n",
-                goalName
+                "You must to provide the relevant mission based on the target '%s'. Please make sure that the response format is strictly as follows.\n" +
+                        "Includes the following information:\n" +
+                        "1. **Mission name**: Name of the mission.\n" +
+                        "2. **That type**: Please use one of the following types: LOVE, MONEY, CARE, Study, Health.\n" +
+                        "   Type the type that follows the score (for example, LOVE 10 points). Each mission must have only one type with one score. The score is from 1 to 10\n" +
+                        "We provide 3 missions unconditionally in an accurate format without additional details.",
+                goalService.getGoal(user.getUserId())
         );
     }
 
@@ -333,28 +327,78 @@ public class FortuneService {
         String[] lines = response.split("\\R");
         List<UserMissionResDto> missionList = new ArrayList<>();
 
-        for (String line : lines) {
-            String[] parts = line.split(" - ");
-            if (parts.length == 2) {
-                String missionName = parts[0].trim();
-                String fortuneTypeStr = parts[1].trim().toUpperCase();
+        String missionName = null;
+        Map<UserMissionResDto.FortuneType, Integer> scores = new HashMap<>();
 
-                try {
-                    UserMissionResDto.FortuneType fortuneType = UserMissionResDto.FortuneType.valueOf(fortuneTypeStr);
-                    UserMissionResDto mission = new UserMissionResDto(translationService.translate(missionName, "KO"), fortuneType);
+        Map<String, UserMissionResDto.FortuneType> typeTranslationMap = new HashMap<>();
+        typeTranslationMap.put("사랑", UserMissionResDto.FortuneType.LOVE);
+        typeTranslationMap.put("건강", UserMissionResDto.FortuneType.HEALTH);
+        typeTranslationMap.put("커리어", UserMissionResDto.FortuneType.CAREER);
+        typeTranslationMap.put("경력", UserMissionResDto.FortuneType.CAREER);
+        typeTranslationMap.put("공부", UserMissionResDto.FortuneType.STUDY);
+        typeTranslationMap.put("돈", UserMissionResDto.FortuneType.MONEY);
+        typeTranslationMap.put("학습", UserMissionResDto.FortuneType.STUDY);
+        typeTranslationMap.put("케어", UserMissionResDto.FortuneType.HEALTH);
+        typeTranslationMap.put("LOVE", UserMissionResDto.FortuneType.LOVE);
+        typeTranslationMap.put("HEALTH", UserMissionResDto.FortuneType.HEALTH);
+        typeTranslationMap.put("CAREER", UserMissionResDto.FortuneType.CAREER);
+        typeTranslationMap.put("STUDY", UserMissionResDto.FortuneType.STUDY);
+        typeTranslationMap.put("CARE", UserMissionResDto.FortuneType.HEALTH);
+
+        for (String line : lines) {
+            line = line.trim();
+            logger.info("Processing line: {}", line);
+
+            if (line.contains("**미션 이름**") || line.contains("**Mission name**")) {
+                String[] splitLine = line.split("\\*\\*미션 이름\\*\\*: |\\*\\*Mission name\\*\\*: ");
+                if (splitLine.length > 1) {
+                    missionName = splitLine[1].trim();
+                    logger.info("Extracted Mission Name: {}", missionName);
+                }
+            }
+            else if (line.contains("**유형**") || line.contains("**그 유형**") || line.contains("**Type**") || line.contains("**That type**")) {
+                String[] splitLine = line.split("\\*\\*(유형|그 유형|Type|That type)\\*\\*: ");
+                if (splitLine.length > 1) {
+                    String[] typeAndPoints = splitLine[1].split(" ");
+                    if (typeAndPoints.length >= 2) {
+                        String fortuneTypeStr = typeAndPoints[0].toUpperCase().trim();
+
+                        if (typeTranslationMap.containsKey(fortuneTypeStr)) {
+                            fortuneTypeStr = typeTranslationMap.get(fortuneTypeStr).name();
+                        }
+
+                        String pointsStr = typeAndPoints[1].replaceAll("[^\\d]", "").trim();
+                        if (!pointsStr.isEmpty()) {
+                            Integer fortunePoints = Integer.parseInt(pointsStr);
+
+                            try {
+                                UserMissionResDto.FortuneType fortuneType = UserMissionResDto.FortuneType.valueOf(fortuneTypeStr);
+                                scores.put(fortuneType, fortunePoints);
+                                logger.info("Extracted Type: {}, Points: {}", fortuneType, fortunePoints);
+                            } catch (IllegalArgumentException e) {
+                                throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Invalid fortune type in response: " + fortuneTypeStr);
+                            }
+                        } else {
+                            logger.warn("Points value is empty or invalid for line: {}", line);
+                        }
+                    } else {
+                        logger.warn("Type and points format is unexpected for line: {}", line);
+                    }
+                }
+
+                if (missionName != null && !scores.isEmpty()) {
+                    UserMissionResDto mission = new UserMissionResDto(missionName, scores);
                     missionList.add(mission);
                     logger.info("Added Mission: {}", mission);
-                } catch (IllegalArgumentException e) {
-                    logger.warn("Invalid FortuneType received: {}", fortuneTypeStr);
 
+                    missionName = null;
+                    scores = new HashMap<>();
                 }
-            } else {
-                logger.warn("Unexpected format in line: {}", line);
             }
         }
 
         if (missionList.isEmpty()) {
-            throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "No valid missions extracted from response.");
+            throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract mission from response.");
         }
 
         return missionList;
