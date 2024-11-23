@@ -12,4 +12,6 @@ public interface FortuneRepository extends JpaRepository<Fortune, Integer> {
 
     Optional<Fortune> findByUserAndDate(User user, LocalDate date);
 
+    Optional<Fortune> findByUser_UserIdAndDate(Integer userId, LocalDate date);
+
 }

@@ -77,6 +77,7 @@ public interface TodoControllerDocs {
             }
     )
     ApiResponseTemplate<String> completeTodo(
+            Principal principal,
             @PathVariable("todo_id") Integer todoId
     );
 
