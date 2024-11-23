@@ -119,23 +119,23 @@ public class FortuneService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
                         ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
-        LocalDate today = LocalDate.now();
-        if (fortuneRepository.existsByUserAndDate(user, today)) {
-
-            Fortune fortune = fortuneRepository.findByUserAndDate(user, today)
-                    .orElseThrow(() -> new CustomException(ErrorCode.NO_FORTUNE_ERROR, ErrorCode.NO_FORTUNE_ERROR.getMessage()));
-
-            UserFortuneResponseDto userFortuneResponseDto =  UserFortuneResponseDto.builder()
-                    .fortuneKeywords(fortune.getFortuneKeywords())
-                    .shortFortune(fortune.getShortFortune())
-                    .fullFortune(fortune.getFullFortune())
-                    .categoryFortuneScores(fortune.getCategoryFortuneScores())
-                    .timeOfDayFortuneScores(fortune.getTimeOfDayFortuneScores())
-                    .overallFortuneScore(fortune.getOverallFortuneScore())
-                    .build();
-
-            return ApiResponseTemplate.success(SuccessCode.GET_FORTUNE_SUCCESS,userFortuneResponseDto);
-        }
+//        LocalDate today = LocalDate.now();
+//        if (fortuneRepository.existsByUserAndDate(user, today)) {
+//
+//            Fortune fortune = fortuneRepository.findByUserAndDate(user, today)
+//                    .orElseThrow(() -> new CustomException(ErrorCode.NO_FORTUNE_ERROR, ErrorCode.NO_FORTUNE_ERROR.getMessage()));
+//
+//            UserFortuneResponseDto userFortuneResponseDto =  UserFortuneResponseDto.builder()
+//                    .fortuneKeywords(fortune.getFortuneKeywords())
+//                    .shortFortune(fortune.getShortFortune())
+//                    .fullFortune(fortune.getFullFortune())
+//                    .categoryFortuneScores(fortune.getCategoryFortuneScores())
+//                    .timeOfDayFortuneScores(fortune.getTimeOfDayFortuneScores())
+//                    .overallFortuneScore(fortune.getOverallFortuneScore())
+//                    .build();
+//
+//            return ApiResponseTemplate.success(SuccessCode.GET_FORTUNE_SUCCESS,userFortuneResponseDto);
+//        }
 
         String prompt = generateFortunePrompt(user);
         String translatedPrompt = translationService.translate(prompt, "EN");
@@ -179,7 +179,6 @@ public class FortuneService {
                 .fullFortune(translatedFortuneResponse.fullFortune())
                 .build();
 
-        fortuneRepository.save(fortune);
 
         return ApiResponseTemplate.success(SuccessCode.GET_USER_FORTUNE_SUCCESS, translatedFortuneResponse);
     }
@@ -205,6 +204,8 @@ public class FortuneService {
 
 
     private UserFortuneResponseDto parseFortuneResponse(String response) {
+        logger.info("Full response received: {}", response); // 전체 응답 로그로 출력
+
         List<String> keywords = extractKeywords(response);
         String shortFortune = extractShortFortune(response);
         String fullFortune = extractFullFortune(response);
@@ -213,6 +214,7 @@ public class FortuneService {
 
         return new UserFortuneResponseDto(keywords, shortFortune, fullFortune, categoryFortuneScores, timeOfDayFortuneScores);
     }
+
 
     private List<String> extractKeywords(String response) {
         Pattern pattern = Pattern.compile("(?<=\\*\\*(키워드|Keywords)\\*\\*:)[\\s]*([^\\n]*)", Pattern.CASE_INSENSITIVE);
@@ -262,23 +264,38 @@ public class FortuneService {
     }
 
     private Map<String, Integer> extractTimeOfDayFortuneScores(String response) {
-        Pattern pattern = Pattern.compile("(?<=\\*\\*(전체 점수|Overall Scores)\\*\\*:)[\\s]*([^\\n]*)", Pattern.CASE_INSENSITIVE);
+        // 정규식을 수정하여 여러 줄에 걸친 점수들을 추출할 수 있도록 함
+        Pattern pattern = Pattern.compile("\\*\\*(전체 점수|Overall Scores)\\*\\*:\\s*(.*?)(?=(\\*\\*|$))", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
-            String[] scores = matcher.group(2).split(",\\s*");
+            String scoresSection = matcher.group(2).trim();
+            logger.info("Extracted time of day scores section: {}", scoresSection); // 응답 데이터 로그로 출력
+
+            String[] scores = scoresSection.split("-\\s*");
             Map<String, Integer> scoreMap = new HashMap<>();
+
             for (String score : scores) {
                 String[] parts = score.split(":\\s*");
                 if (parts.length == 2) {
-                    String key = parts[0].trim().replaceFirst("^-\\s*", "");
-                    Integer value = Integer.parseInt(parts[1].trim());
-                    scoreMap.put(key, value);
+                    try {
+                        String key = parts[0].trim();
+                        Integer value = Integer.parseInt(parts[1].trim());
+                        scoreMap.put(key, value);
+                        logger.info("Extracted Time of Day: {}, Score: {}", key, value); // 각 시간대와 점수 로그로 출력
+                    } catch (NumberFormatException e) {
+                        logger.warn("Invalid score format for: {}", score); // 잘못된 형식의 점수 로그로 경고 출력
+                    }
+                } else {
+                    logger.warn("Unexpected format for score: {}", score); // 예상치 못한 형식의 데이터 경고 출력
                 }
             }
+
             return scoreMap;
         }
         throw new CustomException(ErrorCode.FAILED_GET_GPT_RESPONSE_EXCEPTION, "Failed to extract time of day scores from response.");
     }
+
+
 
     @Transactional
     public List<UserMissionResDto> createDailyMission(Principal principal) {
