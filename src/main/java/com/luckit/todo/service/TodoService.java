@@ -72,7 +72,7 @@ public class TodoService {
         if (!todoRepository.existsByGoal_IdAndIsMadeByGptTrueAndDate(goalId, LocalDate.now())) {
             Random random = new Random(); // Random 객체 생성
 
-            List<UserMissionResDto> missionResDtos = fortuneService.createDailyMission(principal, goalId);
+            List<UserMissionResDto> missionResDtos = (List<UserMissionResDto>) fortuneService.createDailyMission(principal);
             for (UserMissionResDto missionResDto : missionResDtos) {
 
                 int randomAnimal = random.nextInt(12) + 1;
@@ -90,6 +90,7 @@ public class TodoService {
                         .fortuneType(fortuneType.name())
                         .animal(randomAnimal)
                         .score(score)
+                        .date(LocalDate.now())
                         .build();
 
                 todoRepository.save(todo);

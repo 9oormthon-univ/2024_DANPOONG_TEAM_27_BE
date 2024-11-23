@@ -89,4 +89,5 @@ public class FortuneController {
         return ResponseEntity.status(data.getStatus()).body(data);
     }
 
+
 }

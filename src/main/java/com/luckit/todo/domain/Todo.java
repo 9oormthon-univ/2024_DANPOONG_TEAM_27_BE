@@ -32,7 +32,9 @@ public class Todo {
     @CreatedDate
     private LocalDate date;
 
-    private boolean isCompleted;
+    @Column(name = "id_completed", nullable = false)
+    @Builder.Default
+    private boolean isCompleted = false;
 
     private boolean isMadeByGpt;
 

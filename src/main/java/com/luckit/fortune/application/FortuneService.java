@@ -281,7 +281,7 @@ public class FortuneService {
     }
 
     @Transactional
-    public ApiResponseTemplate<List<UserMissionResDto>> createDailyMission(Principal principal) {
+    public List<UserMissionResDto> createDailyMission(Principal principal) {
         Integer userId = Integer.parseInt(principal.getName());
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION,
@@ -308,7 +308,7 @@ public class FortuneService {
 
         List<UserMissionResDto> missionResDto = parseMissionResponse(translatedResponseToKO);
 
-        return ApiResponseTemplate.success(SuccessCode.GET_USER_MISSION_SUCCESS, missionResDto);
+        return  missionResDto;
     }
 
     private String generateMissionPrompt(User user) {
@@ -358,6 +358,7 @@ public class FortuneService {
             }
             else if (line.contains("**유형**") || line.contains("**그 유형**") || line.contains("**Type**") || line.contains("**That type**")) {
                 String[] splitLine = line.split("\\*\\*(유형|그 유형|Type|That type)\\*\\*: ");
+                UserMissionResDto.FortuneType fortuneType = null;
                 if (splitLine.length > 1) {
                     String[] typeAndPoints = splitLine[1].split(" ");
                     if (typeAndPoints.length >= 2) {
@@ -372,7 +373,7 @@ public class FortuneService {
                             Integer fortunePoints = Integer.parseInt(pointsStr);
 
                             try {
-                                UserMissionResDto.FortuneType fortuneType = UserMissionResDto.FortuneType.valueOf(fortuneTypeStr);
+                                fortuneType = UserMissionResDto.FortuneType.valueOf(fortuneTypeStr);
                                 scores.put(fortuneType, fortunePoints);
                                 logger.info("Extracted Type: {}, Points: {}", fortuneType, fortunePoints);
                             } catch (IllegalArgumentException e) {
@@ -386,14 +387,14 @@ public class FortuneService {
                     }
                 }
 
-                if (missionName != null && !scores.isEmpty()) {
-                    UserMissionResDto mission = new UserMissionResDto(missionName, scores);
+                if (missionName != null && fortuneType != null) {
+                    UserMissionResDto mission = new UserMissionResDto(missionName, fortuneType);
                     missionList.add(mission);
                     logger.info("Added Mission: {}", mission);
 
                     missionName = null;
-                    scores = new HashMap<>();
                 }
+
             }
         }
 
