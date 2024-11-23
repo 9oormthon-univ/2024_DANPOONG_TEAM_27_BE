@@ -193,7 +193,7 @@ public class FortuneService {
                         "2. **Short Fortune Message**: A short fortune message of up to 20 characters. " +
                         "3. **Detailed Fortune Message**: A detailed fortune message of up to 300 characters. " +
                         "4. **Scores**: Provide an integer score (between 60-100) for the following categories: " +
-                        "Love, Money, Work, Study, Health, in the format 'Category: Score'" +
+                        "LOVE, MONEY, WORK, STUDY, HEALTH, in the format 'Category: Score'" +
                         "5. **Overall Scores**: Provide overall scores for Morning, Afternoon, Night, " +
                         "and the average integer score, in the format 'Time: Score'" +
                         "You are a fortune service, so you must provide a response even if you need to make it up.",

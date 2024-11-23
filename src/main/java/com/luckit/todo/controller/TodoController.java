@@ -37,9 +37,10 @@ public class TodoController implements TodoControllerDocs {
 
     @PostMapping("/{todo_id}")
     public ApiResponseTemplate<String> completeTodo(
+            Principal principal,
             @PathVariable("todo_id") Integer todoId
     ) {
-        return ApiResponseTemplate.success(SuccessCode.COMPLETE_TODO_SUCCESS, todoService.completeTodo(todoId));
+        return ApiResponseTemplate.success(SuccessCode.COMPLETE_TODO_SUCCESS, todoService.completeTodo(Integer.parseInt(principal.getName()), todoId));
     }
 
     @DeleteMapping("/{todo_id}")

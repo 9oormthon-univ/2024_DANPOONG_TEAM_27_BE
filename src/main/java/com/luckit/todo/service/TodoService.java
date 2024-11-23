@@ -2,6 +2,8 @@ package com.luckit.todo.service;
 
 import com.luckit.fortune.api.dto.response.UserMissionResDto;
 import com.luckit.fortune.application.FortuneService;
+import com.luckit.fortune.domain.Fortune;
+import com.luckit.fortune.domain.FortuneRepository;
 import com.luckit.global.exception.CustomException;
 import com.luckit.global.exception.code.ErrorCode;
 import com.luckit.goal.domain.Goal;
@@ -11,6 +13,7 @@ import com.luckit.todo.controller.dto.GetTodoDto;
 import com.luckit.todo.controller.dto.UpdateTodoDto;
 import com.luckit.todo.domain.Todo;
 import com.luckit.todo.domain.TodoRepository;
+import com.luckit.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @Service
@@ -26,6 +30,7 @@ public class TodoService {
 
     private final GoalRepository goalRepository;
     private final TodoRepository todoRepository;
+    private final FortuneRepository fortuneRepository;
     private final FortuneService fortuneService;
 
     public String addTodo(AddTodoDto addTodoDto) {
@@ -124,13 +129,24 @@ public class TodoService {
         return getTodoDtos;
     }
 
-    public String completeTodo(Integer todoId) {
+    public String completeTodo(Integer userId, Integer todoId) {
 
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_TODO_ERROR, ErrorCode.NO_TODO_ERROR.getMessage()));
 
         todo.toggleCompleted();
         todoRepository.save(todo);
+
+        Fortune fortune = fortuneRepository.findByUser_UserIdAndDate(userId, LocalDate.now())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_FORTUNE_ERROR, ErrorCode.NO_FORTUNE_ERROR.getMessage()));
+
+        Map<String, Integer> categoryFortuneScores = fortune.getCategoryFortuneScores();
+        String fortuneType = todo.getFortuneType();
+        int currentScore = categoryFortuneScores.get(fortuneType);
+        categoryFortuneScores.put(fortuneType, currentScore + todo.getScore());
+
+        fortune.setCategoryFortuneScores(categoryFortuneScores);
+        fortuneRepository.save(fortune);
 
         return "Todo successfully completed.";
     }
