@@ -30,7 +30,6 @@ jwt:
   access-token-validity-in-milliseconds: ${ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
   refresh-token-validity-in-milliseconds: ${REFRESH_TOKEN_VALIDITY_IN_MILLISECONDS}
 
-
 oauth:
   kakao:
     client-id: ${KAKAO_CLIENT_ID}
@@ -48,4 +47,3 @@ openai:
   api:
     key: ${OPEN_AI_API_KEY}
     url: ${OPEN_AI_API_URL}
-
